@@ -15,17 +15,28 @@ public class LevelSpawnPoint : MonoBehaviour
 
     private void Start()
     {
-        // Check if this spawn point matches the connection used during the scene transition
+        // Check if this spawn point matches the connection used during door scene transition
         if (connection != null && connection == LevelConnection.ActiveConnection)
         {
             GameObject player = GameObject.FindWithTag(playerTag);
+            if (player == null && PlayerController.Instance != null)
+            {
+                player = PlayerController.Instance.gameObject;
+            }
+
             if (player != null)
             {
                 player.transform.position = transform.position;
+
+                // Reset player health position tracker so scene teleportation doesn't count as walking distance
+                if (PlayerHealth.Instance != null)
+                {
+                    PlayerHealth.Instance.ResetLastPosition();
+                }
             }
             else
             {
-                Debug.LogWarning($"[LevelSpawnPoint] Active connection matched, but GameObject with tag '{playerTag}' was not found in the scene.");
+                Debug.LogWarning($"[LevelSpawnPoint] Active connection matched, but GameObject with tag '{playerTag}' or PlayerController instance was not found in the scene.");
             }
         }
     }
