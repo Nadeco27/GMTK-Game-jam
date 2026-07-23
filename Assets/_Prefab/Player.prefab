@@ -185,7 +185,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e85c2484bfee0a64aaff7213e6c2ad1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInkTrail
-  minDistanceBetweenPoints: 0.15
+  minDistanceBetweenPoints: 0.1
   minVelocityThreshold: 0.1
 --- !u!114 &2412732368860329645
 MonoBehaviour:
@@ -201,7 +201,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
   maxHealth: 5
   healthLossPerUnit: 1
-  initialSceneName: Map 1 (Spawn)
+  fallbackSceneName: Level_1
 --- !u!96 &4743545016027033734
 TrailRenderer:
   serializedVersion: 3

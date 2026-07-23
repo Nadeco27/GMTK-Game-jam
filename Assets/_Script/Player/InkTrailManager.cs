@@ -11,11 +11,9 @@ public class InkTrailManager : MonoBehaviour
 {
     public static InkTrailManager Instance { get; private set; }
 
-    [Header("Ink Line Visual Settings")]
-    [SerializeField] private float lineWidth = 0.35f;
-    [SerializeField] private Color inkColor = Color.black;
-    [SerializeField] private string sortingLayerName = "Default";
-    [SerializeField] private int sortingOrder = -1;
+    [Header("Ink Dot Visual Settings")]
+    [Tooltip("Masukkan Prefab yang memiliki SpriteRenderer dengan gambar titik/jejak Anda.")]
+    [SerializeField] private GameObject dotPrefab;
 
     [Header("Run Tracking")]
     [Tooltip("Current run index. Incremented each time player dies and respawns.")]
@@ -29,10 +27,7 @@ public class InkTrailManager : MonoBehaviour
     // Dictionary mapping scene name -> list of strokes in that scene
     private Dictionary<string, List<InkStroke>> sceneStrokes = new Dictionary<string, List<InkStroke>>();
 
-    private List<LineRenderer> activeLineRenderers = new List<LineRenderer>();
     private InkStroke currentStroke;
-    private LineRenderer currentLineRenderer;
-    private Material inkMaterial;
     private GameObject inkContainer;
 
     /// <summary>
@@ -59,7 +54,6 @@ public class InkTrailManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        CreateDefaultMaterial();
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
@@ -68,21 +62,6 @@ public class InkTrailManager : MonoBehaviour
         if (Instance == this)
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
-        }
-    }
-
-    private void CreateDefaultMaterial()
-    {
-        Shader shader = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit-Default");
-        if (shader == null)
-        {
-            shader = Shader.Find("Sprites/Default");
-        }
-
-        if (shader != null)
-        {
-            inkMaterial = new Material(shader);
-            inkMaterial.color = inkColor;
         }
     }
 
@@ -96,7 +75,6 @@ public class InkTrailManager : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // 1. Ignore Additive scene loads (such as UIScene loading additively)
-        // so additive loads never destroy or disrupt gameplay ink renderers!
         if (mode == LoadSceneMode.Additive) return;
 
         // 2. Clear ink renderers when entering a main menu scene
@@ -111,8 +89,6 @@ public class InkTrailManager : MonoBehaviour
 
         // 3. Reset current active stroke when changing gameplay scenes
         currentStroke = null;
-        currentLineRenderer = null;
-        activeLineRenderers.Clear();
 
         // 4. Re-render all existing strokes for this gameplay scene
         RebuildSceneStrokes(scene.name);
@@ -128,7 +104,6 @@ public class InkTrailManager : MonoBehaviour
             Destroy(inkContainer);
         }
         inkContainer = new GameObject("[InkTrailContainer]");
-        activeLineRenderers.Clear();
 
         if (!sceneStrokes.ContainsKey(sceneName))
         {
@@ -136,70 +111,13 @@ public class InkTrailManager : MonoBehaviour
             return;
         }
 
-        List<InkStroke> strokes = sceneStrokes[sceneName];
-        foreach (InkStroke stroke in strokes)
+        foreach (InkStroke stroke in sceneStrokes[sceneName])
         {
-            if (stroke.points.Count >= 2)
+            foreach (Vector2 point in stroke.points)
             {
-                LineRenderer lr = CreateLineRendererObject();
-                lr.positionCount = stroke.points.Count;
-                for (int i = 0; i < stroke.points.Count; i++)
-                {
-                    lr.SetPosition(i, new Vector3(stroke.points[i].x, stroke.points[i].y, 0f));
-                }
-                activeLineRenderers.Add(lr);
+                SpawnDotObject(point);
             }
         }
-    }
-
-    /// <summary>
-    /// Starts a new ink stroke at the specified world position for the current run.
-    /// </summary>
-    public void StartNewStroke(Vector2 startPos)
-    {
-        string currentScene = SceneManager.GetActiveScene().name;
-        if (IsNonGameplayScene(currentScene)) return;
-
-        if (!sceneStrokes.ContainsKey(currentScene))
-        {
-            sceneStrokes[currentScene] = new List<InkStroke>();
-        }
-
-        currentStroke = new InkStroke(currentRunIndex);
-        currentStroke.AddPoint(startPos);
-        sceneStrokes[currentScene].Add(currentStroke);
-
-        currentLineRenderer = CreateLineRendererObject();
-        currentLineRenderer.positionCount = 1;
-        currentLineRenderer.SetPosition(0, new Vector3(startPos.x, startPos.y, 0f));
-        
-        activeLineRenderers.Add(currentLineRenderer);
-    }
-
-    /// <summary>
-    /// Appends a new point to the currently active stroke.
-    /// </summary>
-    public void AddPointToCurrentStroke(Vector2 point)
-    {
-        if (currentStroke == null || currentLineRenderer == null)
-        {
-            StartNewStroke(point);
-            return;
-        }
-
-        currentStroke.AddPoint(point);
-        int index = currentLineRenderer.positionCount;
-        currentLineRenderer.positionCount = index + 1;
-        currentLineRenderer.SetPosition(index, new Vector3(point.x, point.y, 0f));
-    }
-
-    /// <summary>
-    /// Ends the current stroke drawing.
-    /// </summary>
-    public void EndCurrentStroke()
-    {
-        currentStroke = null;
-        currentLineRenderer = null;
     }
 
     /// <summary>
@@ -229,29 +147,67 @@ public class InkTrailManager : MonoBehaviour
         }
     }
 
-    private LineRenderer CreateLineRendererObject()
+    private void SpawnDotObject(Vector2 position)
     {
+        if (dotPrefab == null) return;
+        
         if (inkContainer == null)
         {
             inkContainer = new GameObject("[InkTrailContainer]");
         }
 
-        GameObject strokeObj = new GameObject("InkStroke");
-        strokeObj.transform.SetParent(inkContainer.transform);
+        GameObject dot = Instantiate(dotPrefab, position, Quaternion.identity, inkContainer.transform);
+        
+        
+        dot.transform.rotation = Quaternion.Euler(0f, 0f, UnityEngine.Random.Range(0f, 360f));
+        
+        // Randomize the scale of the dot 
+        float randomScale = UnityEngine.Random.Range(0.1f, 0.2f);
+        dot.transform.localScale = new Vector3(randomScale, randomScale, 1f);
+    }
 
-        LineRenderer lr = strokeObj.AddComponent<LineRenderer>();
-        lr.startWidth = lineWidth;
-        lr.endWidth = lineWidth;
-        lr.startColor = inkColor;
-        lr.endColor = inkColor;
-        lr.material = inkMaterial;
-        lr.numCapVertices = 4;
-        lr.numCornerVertices = 4;
-        lr.useWorldSpace = true;
-        lr.sortingLayerName = sortingLayerName;
-        lr.sortingOrder = sortingOrder;
+    /// <summary>
+    /// Starts a new ink stroke at the specified world position for the current run.
+    /// </summary>
+    public void StartNewStroke(Vector2 startPos)
+    {
+        string currentScene = SceneManager.GetActiveScene().name;
+        if (IsNonGameplayScene(currentScene)) return;
 
-        return lr;
+        if (!sceneStrokes.ContainsKey(currentScene))
+        {
+            sceneStrokes[currentScene] = new List<InkStroke>();
+        }
+
+        currentStroke = new InkStroke(currentRunIndex);
+        currentStroke.AddPoint(startPos);
+        sceneStrokes[currentScene].Add(currentStroke);
+
+        // Munculkan gambar titik pertama
+        SpawnDotObject(startPos);
+    }
+
+    /// <summary>
+    /// Appends a new point to the currently active stroke.
+    /// </summary>
+    public void AddPointToCurrentStroke(Vector2 point)
+    {
+        if (currentStroke == null)
+        {
+            StartNewStroke(point);
+            return;
+        }
+
+        currentStroke.AddPoint(point);
+        SpawnDotObject(point);
+    }
+
+    /// <summary>
+    /// Ends the current stroke drawing.
+    /// </summary>
+    public void EndCurrentStroke()
+    {
+        currentStroke = null;
     }
 
     #region Clean Mechanics
