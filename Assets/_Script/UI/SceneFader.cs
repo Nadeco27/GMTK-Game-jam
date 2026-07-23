@@ -6,6 +6,7 @@ using UnityEngine.UI;
 /// <summary>
 /// Handles smooth asynchronous scene transitions with screen fade effects.
 /// Prevents game freezing and handles input locking during scene transitions.
+/// Auto-initializes on Play Mode entry if not present in scene.
 /// </summary>
 public class SceneFader : MonoBehaviour
 {
@@ -16,6 +17,19 @@ public class SceneFader : MonoBehaviour
     [Header("UI References")]
     [SerializeField] private CanvasGroup faderCanvasGroup;
     [SerializeField] private float fadeDuration = 0.4f;
+
+    /// <summary>
+    /// Automatically ensures SceneFader exists as soon as Play Mode starts.
+    /// </summary>
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    private static void AutoInitialize()
+    {
+        if (Instance == null)
+        {
+            GameObject faderObj = new GameObject("[SceneFader]");
+            faderObj.AddComponent<SceneFader>();
+        }
+    }
 
     private void Awake()
     {

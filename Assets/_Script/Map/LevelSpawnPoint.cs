@@ -15,7 +15,7 @@ public class LevelSpawnPoint : MonoBehaviour
 
     private void Start()
     {
-        // Check if this spawn point matches the connection used during the scene transition
+        // Check if this spawn point matches the connection used during door scene transition
         if (connection != null && connection == LevelConnection.ActiveConnection)
         {
             GameObject player = GameObject.FindWithTag(playerTag);
@@ -27,6 +27,12 @@ public class LevelSpawnPoint : MonoBehaviour
             if (player != null)
             {
                 player.transform.position = transform.position;
+
+                // Reset player health position tracker so scene teleportation doesn't count as walking distance
+                if (PlayerHealth.Instance != null)
+                {
+                    PlayerHealth.Instance.ResetLastPosition();
+                }
             }
             else
             {
