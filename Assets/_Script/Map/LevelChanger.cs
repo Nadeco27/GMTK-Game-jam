@@ -21,10 +21,12 @@ public class LevelChanger : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (hasTriggered) return;
-
         if (collision.CompareTag(playerTag))
         {
+            // Ignore trigger if SceneFader is currently transitioning or already triggered
+            if (SceneFader.Instance != null && SceneFader.Instance.IsTransitioning) return;
+            if (hasTriggered) return;
+
             if (connection == null)
             {
                 Debug.LogError($"[LevelChanger] Connection ScriptableObject is not assigned on {gameObject.name}!");
@@ -49,6 +51,14 @@ public class LevelChanger : MonoBehaviour
                 LevelConnection.ActiveConnection = connection;
                 SceneManager.LoadSceneAsync(targetSceneName);
             }
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag(playerTag))
+        {
+            hasTriggered = false;
         }
     }
 }

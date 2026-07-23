@@ -5,17 +5,17 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Handles smooth asynchronous scene transitions with screen fade effects.
-/// Prevents game freezing when loading scenes in Metroidvania style games.
+/// Prevents game freezing and handles input locking during scene transitions.
 /// </summary>
 public class SceneFader : MonoBehaviour
 {
     public static SceneFader Instance { get; private set; }
 
+    public bool IsTransitioning { get; private set; }
+
     [Header("UI References")]
     [SerializeField] private CanvasGroup faderCanvasGroup;
     [SerializeField] private float fadeDuration = 0.4f;
-
-    private bool isTransitioning;
 
     private void Awake()
     {
@@ -44,14 +44,25 @@ public class SceneFader : MonoBehaviour
     /// </summary>
     public void FadeToScene(string sceneName, LevelConnection connection)
     {
-        if (isTransitioning) return;
+        if (IsTransitioning) return;
         StartCoroutine(FadeAndLoadRoutine(sceneName, connection));
     }
 
     private IEnumerator FadeAndLoadRoutine(string sceneName, LevelConnection connection)
     {
-        isTransitioning = true;
+        IsTransitioning = true;
         faderCanvasGroup.blocksRaycasts = true;
+
+        // Temporarily disable player input and stop movement during transition
+        if (PlayerController.Instance != null)
+        {
+            PlayerController.Instance.enabled = false;
+            Rigidbody2D playerRb = PlayerController.Instance.GetComponent<Rigidbody2D>();
+            if (playerRb != null)
+            {
+                playerRb.linearVelocity = Vector2.zero;
+            }
+        }
 
         // 1. Fade Out (To Black)
         float timer = 0f;
@@ -85,14 +96,21 @@ public class SceneFader : MonoBehaviour
         }
         faderCanvasGroup.alpha = 0f;
         faderCanvasGroup.blocksRaycasts = false;
-        isTransitioning = false;
+
+        // Re-enable player controller after fade transition finishes completely
+        if (PlayerController.Instance != null)
+        {
+            PlayerController.Instance.enabled = true;
+        }
+
+        IsTransitioning = false;
     }
 
     private void CreateDefaultFaderUI()
     {
         GameObject canvasObj = new GameObject("SceneFaderCanvas");
         canvasObj.transform.SetParent(transform);
-        
+
         Canvas canvas = canvasObj.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 999;
@@ -104,7 +122,7 @@ public class SceneFader : MonoBehaviour
 
         GameObject imageObj = new GameObject("FadeImage");
         imageObj.transform.SetParent(canvasObj.transform, false);
-        
+
         Image image = imageObj.AddComponent<Image>();
         image.color = Color.black;
 
