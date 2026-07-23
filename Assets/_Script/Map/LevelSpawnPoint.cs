@@ -19,13 +19,18 @@ public class LevelSpawnPoint : MonoBehaviour
         if (connection != null && connection == LevelConnection.ActiveConnection)
         {
             GameObject player = GameObject.FindWithTag(playerTag);
+            if (player == null && PlayerController.Instance != null)
+            {
+                player = PlayerController.Instance.gameObject;
+            }
+
             if (player != null)
             {
                 player.transform.position = transform.position;
             }
             else
             {
-                Debug.LogWarning($"[LevelSpawnPoint] Active connection matched, but GameObject with tag '{playerTag}' was not found in the scene.");
+                Debug.LogWarning($"[LevelSpawnPoint] Active connection matched, but GameObject with tag '{playerTag}' or PlayerController instance was not found in the scene.");
             }
         }
     }
