@@ -16,7 +16,7 @@ public class UIManager : MonoBehaviour
 
     [Header("Excluded Scenes")]
     [Tooltip("Names of scenes where the gameplay UI should NOT be loaded (e.g. MainMenu).")]
-    [SerializeField] private List<string> nonGameplayScenes = new List<string> { "MainMenu", "Menu", "Title", "StartMenu" };
+    [SerializeField] private List<string> nonGameplayScenes = new List<string> { "Index" };
 
     /// <summary>
     /// Automatically runs when Play Mode starts, ensuring UIManager exists.

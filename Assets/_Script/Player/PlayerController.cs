@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -17,6 +19,10 @@ public class PlayerController : MonoBehaviour
     [Header("Persistence")]
     [Tooltip("If true, this player object will not be destroyed when switching scenes.")]
     [SerializeField] private bool isPersistent = true;
+
+    [Header("Scene Gating")]
+    [Tooltip("Scenes where the player should be deactivated (main menu, settings, etc).")]
+    [SerializeField] private List<string> nonGameplayScenes = new List<string> { "Index" };
 
     private Rigidbody2D rb;
     private Vector2 moveInput;
@@ -43,7 +49,42 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+
+        SceneManager.sceneLoaded += OnSceneLoaded; // subscribe once, here
+        UpdateActiveStateForScene(SceneManager.GetActiveScene().name);
     }
+
+    //  private void OnEnable()
+    // {
+    //     SceneManager.sceneLoaded += OnSceneLoaded;
+    // }
+
+    // private void OnDisable()
+    // {
+    //     SceneManager.sceneLoaded -= OnSceneLoaded;
+    // }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded; // only unsubscribe on real destruction
+    }
+
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Only react to the active scene changing, not additive UI scene loads
+        if (scene == SceneManager.GetActiveScene())
+        {
+            UpdateActiveStateForScene(scene.name);
+        }
+    }
+
+    private void UpdateActiveStateForScene(string sceneName)
+    {
+        bool disable = nonGameplayScenes.Contains(sceneName);
+        gameObject.SetActive(!disable);
+    }
+
 
     private void Update()
     {

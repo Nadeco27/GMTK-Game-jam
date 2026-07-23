@@ -1309,7 +1309,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
   uiSceneName: UIScene
   nonGameplayScenes:
-  - MainMenu
+  - Index
 --- !u!1 &2072121853
 GameObject:
   m_ObjectHideFlags: 0
