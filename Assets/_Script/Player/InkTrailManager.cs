@@ -88,15 +88,18 @@ public class InkTrailManager : MonoBehaviour
 
     private bool IsNonGameplayScene(string sceneName)
     {
-        return sceneName.Equals("UIScene", System.StringComparison.OrdinalIgnoreCase)
-            || sceneName.Equals("MainMenu", System.StringComparison.OrdinalIgnoreCase)
+        return sceneName.Equals("MainMenu", System.StringComparison.OrdinalIgnoreCase)
             || sceneName.Equals("Menu", System.StringComparison.OrdinalIgnoreCase)
             || sceneName.Equals("Title", System.StringComparison.OrdinalIgnoreCase);
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // Don't process non-gameplay scenes (like MainMenu or UIScene)
+        // 1. Ignore Additive scene loads (such as UIScene loading additively)
+        // so additive loads never destroy or disrupt gameplay ink renderers!
+        if (mode == LoadSceneMode.Additive) return;
+
+        // 2. Clear ink renderers when entering a main menu scene
         if (IsNonGameplayScene(scene.name))
         {
             if (inkContainer != null)
@@ -106,12 +109,12 @@ public class InkTrailManager : MonoBehaviour
             return;
         }
 
-        // Reset current active stroke when changing scenes
+        // 3. Reset current active stroke when changing gameplay scenes
         currentStroke = null;
         currentLineRenderer = null;
         activeLineRenderers.Clear();
 
-        // Re-render all existing strokes for this scene
+        // 4. Re-render all existing strokes for this gameplay scene
         RebuildSceneStrokes(scene.name);
     }
 
