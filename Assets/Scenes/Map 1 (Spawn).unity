@@ -242,7 +242,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7395ec0da97247649818392c3a272d06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InkTrailManager
-  dotPrefab: {fileID: 5117234370205672433, guid: 0a56750da6f8e6e428a6a0c4d012dbef, type: 3}
+  dotPrefab: {fileID: 6866443514124114202, guid: 0a56750da6f8e6e428a6a0c4d012dbef, type: 3}
   currentRunIndex: 1
   maxRunRetentionCount: 2
 --- !u!4 &282512158
