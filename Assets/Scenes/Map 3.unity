@@ -688,7 +688,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df23120f1a8a6a84daad61673f681b92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelSpawnPoint
-  connection: {fileID: 0}
+  connection: {fileID: 11400000, guid: 10d34ce0f214ee946a8b50cf630d5070, type: 2}
   playerTag: Player
 --- !u!4 &499013102
 Transform:
@@ -1502,8 +1502,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0e244660b761084aaec1996c136886f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelChanger
-  connection: {fileID: 0}
-  targetSceneName: 
+  connection: {fileID: 11400000, guid: 8242a4db6a5737a4dae8a6d7f5051cdf, type: 2}
+  targetSceneName: Map 4
   playerTag: Player
 --- !u!61 &1143526384
 BoxCollider2D:
