@@ -23,6 +23,10 @@ public class PlayerHealth : MonoBehaviour
     [Tooltip("Fallback scene name if initial birth scene was not recorded.")]
     [SerializeField] private string fallbackSceneName = "Level_1";
 
+    // [Header("Hotbar and hotbar UI Reference")]
+    // [Tooltip("Reference to the Hotbar component on the player.")]
+    // [SerializeField] private Hotbar hotbar;
+
     public float CurrentHealth { get; private set; }
     public float MaxHealth => maxHealth;
     public bool IsDead { get; private set; }

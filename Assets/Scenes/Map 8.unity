@@ -720,7 +720,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df23120f1a8a6a84daad61673f681b92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelSpawnPoint
-  connection: {fileID: 11400000, guid: ba060e83414e84847a66192638a48d55, type: 2}
+  connection: {fileID: 11400000, guid: 384e58d4f11fad843a6dbb539d792636, type: 2}
   playerTag: Player
 --- !u!1 &1365040135
 GameObject:

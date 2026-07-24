@@ -9,6 +9,31 @@ public class ItemPickup : MonoBehaviour, IInteractable
     [Header("Item Pickup Settings")]
     [SerializeField] private ItemData item;
     [SerializeField] private int quantity = 1;
+    [Tooltip("Optional custom unique ID. If blank, auto-generates from scene + object name + item.")]
+    [SerializeField] private string customPickupID = "";
+
+    public string InteractionPrompt => string.Empty;
+
+    private void Start()
+    {
+        CheckAndApplyCollectedState();
+    }
+
+    private string GetPickupKey()
+    {
+        if (!string.IsNullOrEmpty(customPickupID)) return customPickupID;
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        string itemName = item != null ? item.itemName : "unknown";
+        return $"{sceneName}_{gameObject.name}_{itemName}";
+    }
+
+    private void CheckAndApplyCollectedState()
+    {
+        if (ItemManager.Instance != null && ItemManager.Instance.IsCollected(GetPickupKey()))
+        {
+            gameObject.SetActive(false);
+        }
+    }
 
     private static readonly System.Collections.Generic.List<ItemPickup> pickedUpItems = new System.Collections.Generic.List<ItemPickup>();
 
@@ -36,7 +61,6 @@ public class ItemPickup : MonoBehaviour, IInteractable
     }
 
     public bool CanInteract(GameObject interactor) => enabled && gameObject.activeInHierarchy;
-    public string InteractionPrompt => string.Empty;
 
     public void Interact(GameObject interactor)
     {
@@ -52,12 +76,15 @@ public class ItemPickup : MonoBehaviour, IInteractable
 
         string itemNameStr = item != null && !string.IsNullOrEmpty(item.itemName) ? item.itemName : gameObject.name;
         NotificationUI.ShowNotification($"Item {itemNameStr} added to backpack.");
+
+
         
-        // Track item for respawn on player death and disable
-        if (!pickedUpItems.Contains(this))
-        {
-            pickedUpItems.Add(this);
-        }
+        // // Track item for respawn on player death and disable
+        // if (!pickedUpItems.Contains(this))
+        // {
+        //     pickedUpItems.Add(this);
+        // }
+        ItemManager.Instance?.MarkCollected(GetPickupKey());
         gameObject.SetActive(false);
     }
 

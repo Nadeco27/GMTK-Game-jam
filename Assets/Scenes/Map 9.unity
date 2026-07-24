@@ -810,8 +810,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0e244660b761084aaec1996c136886f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelChanger
-  connection: {fileID: 11400000, guid: 51b29a24702fb0a47ae87802cf3a3489, type: 2}
-  targetSceneName: Map 10
+  connection: {fileID: 11400000, guid: 384e58d4f11fad843a6dbb539d792636, type: 2}
+  targetSceneName: Map 8
   playerTag: Player
 --- !u!61 &1170660052
 BoxCollider2D:

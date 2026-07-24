@@ -1153,7 +1153,7 @@ GameObject:
   - component: {fileID: 781735837}
   - component: {fileID: 781735838}
   m_Layer: 0
-  m_Name: SpawnFromMap3_2
+  m_Name: SpawnFromMap10_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1505,6 +1505,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
   item: {fileID: 11400000, guid: b8a8e8311257e2c468c3eb25e4a3eeff, type: 2}
   quantity: 1
+  customPickupID: 
 --- !u!58 &1053498768
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -2751,7 +2752,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1.8673515, y: 0.26741314}
+  m_Size: {x: 1.8673515, y: 0.56}
   m_EdgeRadius: 0
 --- !u!1 &1587907490
 GameObject:
@@ -2854,7 +2855,7 @@ GameObject:
   - component: {fileID: 1591135534}
   - component: {fileID: 1591135535}
   m_Layer: 0
-  m_Name: SpawnFromMap3_1
+  m_Name: SpawnFromMap10_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
