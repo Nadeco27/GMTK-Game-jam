@@ -1282,8 +1282,8 @@ GameObject:
   - component: {fileID: 752407710}
   - component: {fileID: 752407713}
   - component: {fileID: 752407712}
-  - component: {fileID: 752407714}
   - component: {fileID: 752407715}
+  - component: {fileID: 752407716}
   m_Layer: 0
   m_Name: Collectible Item
   m_TagString: Player
@@ -1391,7 +1391,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1401,21 +1401,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &752407714
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 752407709}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25e2fc095d5875348a73ca9d9d5e598a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ItemCollectable
-  itemName: Flashlight
-  itemIcon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  promptMessage: Tekan E untuk mengambil
 --- !u!114 &752407715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1431,6 +1416,21 @@ MonoBehaviour:
   promptVisual: {fileID: 129651727}
   floatSpeed: 1.5
   floatAmplitude: 0.02
+--- !u!114 &752407716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752407709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3bfac41808b74d4396569c382115e76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
+  item: {fileID: 11400000, guid: 5d7f78785ca628943b860b7b822f0cc0, type: 2}
+  quantity: 1
+  promptMessage: Tekan E untuk mengambil
 --- !u!1 &1225750542
 GameObject:
   m_ObjectHideFlags: 0
@@ -1815,25 +1815,6 @@ MonoBehaviour:
   uiSceneName: UIScene
   nonGameplayScenes:
   - MainMenu
---- !u!1 &2053046273 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 9050716108364626263, guid: 7dd350dccdfa9f14ca4fa3e29602eb6d, type: 3}
-  m_PrefabInstance: {fileID: 5635524444198018987}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &2053046274
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2053046273}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c9493dc1cd506147b0591d98b017548, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  items: []
-  itemDataList: []
 --- !u!1 &2072121853
 GameObject:
   m_ObjectHideFlags: 0
@@ -1873,26 +1854,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2412732368860329645, guid: 7dd350dccdfa9f14ca4fa3e29602eb6d, type: 3}
-      propertyPath: maxHealth
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 4743545016027033734, guid: 7dd350dccdfa9f14ca4fa3e29602eb6d, type: 3}
-      propertyPath: m_Time
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4743545016027033734, guid: 7dd350dccdfa9f14ca4fa3e29602eb6d, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6016540531062425137, guid: 7dd350dccdfa9f14ca4fa3e29602eb6d, type: 3}
-      propertyPath: interactRadius
-      value: 0.75
-      objectReference: {fileID: 0}
-    - target: {fileID: 6491658941185184498, guid: 7dd350dccdfa9f14ca4fa3e29602eb6d, type: 3}
-      propertyPath: minDistanceBetweenPoints
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 7824492428543716630, guid: 7dd350dccdfa9f14ca4fa3e29602eb6d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.09
@@ -1940,10 +1901,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 9050716108364626263, guid: 7dd350dccdfa9f14ca4fa3e29602eb6d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2053046274}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7dd350dccdfa9f14ca4fa3e29602eb6d, type: 3}
 --- !u!1001 &5732736184438962308
 PrefabInstance:
