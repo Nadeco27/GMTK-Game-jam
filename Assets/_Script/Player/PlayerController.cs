@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
     private Vector2 moveInput;
     private bool isFacingRight = true;
 
+    private Animator anim;
+
     private void Awake()
     {
         if (isPersistent)
@@ -44,6 +46,7 @@ public class PlayerController : MonoBehaviour
         rb.gravityScale = 0f;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
 
+        anim = GetComponent<Animator>();
         // Auto-ensure PlayerInteractor and Inventory components exist on player
         if (GetComponent<PlayerInteractor>() == null)
         {
@@ -84,6 +87,11 @@ public class PlayerController : MonoBehaviour
         }
 
         moveInput = input;
+
+        if (anim != null)
+        {
+            anim.SetFloat("Speed", moveInput.sqrMagnitude);
+        }
 
         // Flip Sprite based on horizontal direction
         if (moveInput.x > 0 && !isFacingRight)

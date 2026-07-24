@@ -165,7 +165,27 @@ public class InkTrailManager : MonoBehaviour
         float randomScale = UnityEngine.Random.Range(0.1f, 0.2f);
         dot.transform.localScale = new Vector3(randomScale, randomScale, 1f);
     }
+    /// <summary>
+    /// Checks if there is any ink stroke point within a specified radius of the target position in the given scene.
+    /// </summary>
+    public bool CheckInkNearPosition(string sceneName, Vector2 targetPos, float radius)
+    {
+        if (!sceneStrokes.ContainsKey(sceneName)) return false;
 
+        float sqrRadius = radius * radius;
+        foreach (InkStroke stroke in sceneStrokes[sceneName])
+        {
+            foreach (Vector2 point in stroke.points)
+            {
+                // Jika jarak antara titik tinta dan target lebih kecil dari radius
+                if ((point - targetPos).sqrMagnitude <= sqrRadius)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     /// <summary>
     /// Starts a new ink stroke at the specified world position for the current run.
     /// </summary>
