@@ -15,6 +15,10 @@ public class InkTrailManager : MonoBehaviour
     [Tooltip("Masukkan Prefab yang memiliki SpriteRenderer dengan gambar titik/jejak Anda.")]
     [SerializeField] private GameObject dotPrefab;
 
+    [Header("Excluded Scenes")]
+    [Tooltip("Names of scenes where ink trails should NOT be created or rendered (e.g. Index, MainMenu).")]
+    [SerializeField] private List<string> nonGameplayScenes = new List<string> { "Index", "MainMenu", "Menu", "Title" };
+
     [Header("Run Tracking")]
     [Tooltip("Current run index. Incremented each time player dies and respawns.")]
     [SerializeField] private int currentRunIndex = 1;
@@ -47,6 +51,11 @@ public class InkTrailManager : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
+            // If existing Instance was created without dotPrefab, transfer reference from this instance before destroying duplicate
+            if (Instance.dotPrefab == null && this.dotPrefab != null)
+            {
+                Instance.dotPrefab = this.dotPrefab;
+            }
             Destroy(gameObject);
             return;
         }
@@ -67,9 +76,14 @@ public class InkTrailManager : MonoBehaviour
 
     private bool IsNonGameplayScene(string sceneName)
     {
-        return sceneName.Equals("MainMenu", System.StringComparison.OrdinalIgnoreCase)
-            || sceneName.Equals("Menu", System.StringComparison.OrdinalIgnoreCase)
-            || sceneName.Equals("Title", System.StringComparison.OrdinalIgnoreCase);
+        foreach (string name in nonGameplayScenes)
+        {
+            if (sceneName.Equals(name, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)

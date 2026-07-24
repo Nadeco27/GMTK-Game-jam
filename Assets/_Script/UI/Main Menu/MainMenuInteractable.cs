@@ -10,7 +10,15 @@ public class MainMenuInteractable : MonoBehaviour
 
     public void PlayScene()
     {
-        SceneManager.LoadScene(targetSceneName);
+        if (SceneFader.Instance != null)
+        {
+            if (SceneFader.Instance.IsTransitioning) return;
+            SceneFader.Instance.FadeToScene(targetSceneName, null);
+        }
+        else
+        {
+            SceneManager.LoadScene(targetSceneName);
+        }
     }
     public void QuitGame()
     {
