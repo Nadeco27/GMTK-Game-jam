@@ -44,5 +44,8 @@ TagManager:
   - name: Player
     uniqueID: 670659087
     locked: 0
+  - name: Overworld UI
+    uniqueID: 920519529
+    locked: 0
   m_RenderingLayers:
   - Default

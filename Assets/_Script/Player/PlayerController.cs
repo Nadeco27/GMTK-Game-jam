@@ -28,6 +28,8 @@ public class PlayerController : MonoBehaviour
     private Vector2 moveInput;
     private bool isFacingRight = true;
 
+    private Animator anim;
+
     private void Awake()
     {
         if (isPersistent)
@@ -49,9 +51,21 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        
+        //merge conflict
+        //SceneManager.sceneLoaded += OnSceneLoaded; // subscribe once, here
+        //UpdateActiveStateForScene(SceneManager.GetActiveScene().name);
+        anim = GetComponent<Animator>();
+        // Auto-ensure PlayerInteractor and Inventory components exist on player
+        if (GetComponent<PlayerInteractor>() == null)
+        {
+            gameObject.AddComponent<PlayerInteractor>();
+        }
 
-        SceneManager.sceneLoaded += OnSceneLoaded; // subscribe once, here
-        UpdateActiveStateForScene(SceneManager.GetActiveScene().name);
+        if (GetComponent<Inventory>() == null)
+        {
+            gameObject.AddComponent<Inventory>();
+        }
     }
 
     //  private void OnEnable()
@@ -115,6 +129,11 @@ public class PlayerController : MonoBehaviour
 
         moveInput = input;
 
+        if (anim != null)
+        {
+            anim.SetFloat("Speed", moveInput.sqrMagnitude);
+        }
+
         // Flip Sprite based on horizontal direction
         if (moveInput.x > 0 && !isFacingRight)
         {
@@ -137,5 +156,17 @@ public class PlayerController : MonoBehaviour
         Vector3 localScale = transform.localScale;
         localScale.x *= -1f;
         transform.localScale = localScale;
+    }
+
+    /// <summary>
+    /// Instantly clears all active trail renderers on the player to prevent magenta teleport streaks across screen.
+    /// </summary>
+    public void ClearTrailRenderers()
+    {
+        TrailRenderer[] trailRenderers = GetComponentsInChildren<TrailRenderer>(true);
+        foreach (TrailRenderer tr in trailRenderers)
+        {
+            tr.Clear();
+        }
     }
 }

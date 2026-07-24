@@ -15,7 +15,9 @@ GameObject:
   - component: {fileID: 8628196486729994013}
   - component: {fileID: 6491658941185184498}
   - component: {fileID: 2412732368860329645}
+  - component: {fileID: 6016540531062425137}
   - component: {fileID: 4743545016027033734}
+  - component: {fileID: 8160949704689352323}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -185,7 +187,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e85c2484bfee0a64aaff7213e6c2ad1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInkTrail
-  minDistanceBetweenPoints: 0.1
+  minDistanceBetweenPoints: 2
   minVelocityThreshold: 0.1
 --- !u!114 &2412732368860329645
 MonoBehaviour:
@@ -199,9 +201,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef98539e8dacdb14fb351459973aabe5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
-  maxHealth: 5
+  maxHealth: 100
   healthLossPerUnit: 1
   fallbackSceneName: Level_1
+--- !u!114 &6016540531062425137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9050716108364626263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f267b670faa40f4b8a14f1d45948307, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractor
+  interactKey: 101
+  interactRadius: 0.75
+  interactableLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  isInteractionDisabled: 0
 --- !u!96 &4743545016027033734
 TrailRenderer:
   serializedVersion: 3
@@ -250,7 +270,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 5
+  m_Time: 0
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
@@ -312,3 +332,32 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
+--- !u!114 &8160949704689352323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9050716108364626263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25e2fc095d5875348a73ca9d9d5e598a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Hotbar
+  slots:
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0

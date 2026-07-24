@@ -23,6 +23,10 @@ public class PlayerHealth : MonoBehaviour
     [Tooltip("Fallback scene name if initial birth scene was not recorded.")]
     [SerializeField] private string fallbackSceneName = "Level_1";
 
+    // [Header("Hotbar and hotbar UI Reference")]
+    // [Tooltip("Reference to the Hotbar component on the player.")]
+    // [SerializeField] private Hotbar hotbar;
+
     public float CurrentHealth { get; private set; }
     public float MaxHealth => maxHealth;
     public bool IsDead { get; private set; }
@@ -176,6 +180,10 @@ public class PlayerHealth : MonoBehaviour
         // Reset level connection so door spawn points are not triggered on respawn
         LevelConnection.ActiveConnection = null;
 
+        // Clear Inventory and Hotbar items on death
+        if (Inventory.Instance != null) Inventory.Instance.Clear();
+        if (Hotbar.Instance != null) Hotbar.Instance.Clear();
+
         string targetScene = string.IsNullOrEmpty(initialBirthSceneName) ? fallbackSceneName : initialBirthSceneName;
 
         // Fade screen out and load initial birth scene
@@ -196,6 +204,13 @@ public class PlayerHealth : MonoBehaviour
 
         // Teleport player back to the exact initial birth position
         transform.position = initialBirthPosition;
+
+        // Clear TrailRenderer components to prevent purple teleport streaks across screen
+        TrailRenderer[] trailRenderers = GetComponentsInChildren<TrailRenderer>(true);
+        foreach (TrailRenderer tr in trailRenderers)
+        {
+            tr.Clear();
+        }
 
         // Reset player state & position for new run
         ResetHealth();

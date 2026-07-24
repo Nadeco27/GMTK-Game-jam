@@ -4,9 +4,9 @@ using TMPro;
 using DG.Tweening;
 
 /// <summary>
-/// Controls the UI display of Player Health / Movement Resource as numbers.
-/// Enhanced with DOTween animations for smooth rolling numbers, punch scale feedback,
-/// and low ink pulsing effects.
+/// Controls the UI display of Player Health / Movement Resource.
+/// Supports both numerical text countdown AND vertical bottle/bar liquid fill (Bottom-to-Top).
+/// Enhanced with DOTween animations for smooth fill transitions, number rolling, and low ink pulsing.
 /// </summary>
 public class PlayerHealthUI : MonoBehaviour
 {
@@ -21,12 +21,22 @@ public class PlayerHealthUI : MonoBehaviour
     [Tooltip("If true, shows 'Current / Max' format (e.g. '100 / 100'). If false, shows '100'.")]
     [SerializeField] private bool showMaxHealth = false;
 
+    [Header("Vertical Health Bar / Bottle Liquid Fill UI")]
+    [Tooltip("UI Image for the vertical liquid fill (Set Image Type: Filled, Fill Method: Vertical, Fill Origin: Bottom).")]
+    [SerializeField] private Image verticalHealthFillImage;
+
+    [Tooltip("Optional Vertical UI Slider (Configured Direction: Bottom To Top).")]
+    [SerializeField] private Slider verticalHealthSlider;
+
     [Header("DOTween Juice Settings")]
     [Tooltip("Enable DOTween animations for health UI.")]
     [SerializeField] private bool useDOTween = true;
 
     [Tooltip("Duration for the number rolling countdown animation.")]
     [SerializeField] private float numberTweenDuration = 0.2f;
+
+    [Tooltip("Duration for the vertical bar fill tween animation.")]
+    [SerializeField] private float fillTweenDuration = 0.25f;
 
     [Tooltip("Color tint when ink health is low (<= 20%).")]
     [SerializeField] private Color lowHealthColor = new Color(0.95f, 0.25f, 0.25f);
@@ -38,6 +48,8 @@ public class PlayerHealthUI : MonoBehaviour
     private Vector3 originalTextScale = Vector3.one;
 
     private Tween numberTween;
+    private Tween fillImageTween;
+    private Tween fillSliderTween;
     private Tween lowHealthPulseTween;
     private Tween punchScaleTween;
 
@@ -53,6 +65,16 @@ public class PlayerHealthUI : MonoBehaviour
             originalTextColor = healthTextTMP.color;
             originalTextScale = healthTextTMP.transform.localScale;
         }
+
+        if (verticalHealthFillImage == null)
+        {
+            // Auto find filled image if attached directly
+            Image img = GetComponent<Image>();
+            if (img != null && img.type == Image.Type.Filled && img.fillMethod == Image.FillMethod.Vertical)
+            {
+                verticalHealthFillImage = img;
+            }
+        }
     }
 
     private void OnEnable()
@@ -64,7 +86,9 @@ public class PlayerHealthUI : MonoBehaviour
             displayedHealthValue = PlayerHealth.Instance.CurrentHealth;
             cachedMaxHealth = PlayerHealth.Instance.MaxHealth;
             lastIntegerHealth = Mathf.CeilToInt(displayedHealthValue);
+            
             UpdateTextDisplay(displayedHealthValue, cachedMaxHealth);
+            UpdateBarFillInstant(displayedHealthValue, cachedMaxHealth);
         }
     }
 
@@ -82,6 +106,8 @@ public class PlayerHealthUI : MonoBehaviour
     private void KillTweens()
     {
         numberTween?.Kill();
+        fillImageTween?.Kill();
+        fillSliderTween?.Kill();
         lowHealthPulseTween?.Kill();
         punchScaleTween?.Kill();
 
@@ -90,12 +116,38 @@ public class PlayerHealthUI : MonoBehaviour
             healthTextTMP.transform.DOKill();
             healthTextTMP.transform.localScale = originalTextScale;
         }
+
+        if (verticalHealthFillImage != null)
+        {
+            verticalHealthFillImage.DOKill();
+        }
     }
 
     private void UpdateHealthUI(float targetHealth, float maxHealth)
     {
         cachedMaxHealth = maxHealth;
         int targetIntHealth = Mathf.CeilToInt(targetHealth);
+        float fillRatio = Mathf.Clamp01(targetHealth / maxHealth);
+
+        // 1. Update Vertical Health Bar / Bottle Fill
+        if (useDOTween)
+        {
+            if (verticalHealthFillImage != null)
+            {
+                fillImageTween?.Kill();
+                fillImageTween = verticalHealthFillImage.DOFillAmount(fillRatio, fillTweenDuration).SetEase(Ease.OutQuad);
+            }
+
+            if (verticalHealthSlider != null)
+            {
+                fillSliderTween?.Kill();
+                fillSliderTween = verticalHealthSlider.DOValue(fillRatio, fillTweenDuration).SetEase(Ease.OutQuad);
+            }
+        }
+        else
+        {
+            UpdateBarFillInstant(targetHealth, maxHealth);
+        }
 
         if (!useDOTween)
         {
@@ -104,14 +156,14 @@ public class PlayerHealthUI : MonoBehaviour
             return;
         }
 
-        // 1. Trigger subtle punch scale ONLY when the integer health number actually changes
+        // 2. Trigger subtle punch scale ONLY when the integer health number actually changes
         if (lastIntegerHealth != -1 && targetIntHealth != lastIntegerHealth)
         {
             TriggerSubtlePunch();
         }
         lastIntegerHealth = targetIntHealth;
 
-        // 2. Smooth Number Rolling Countdown Tween
+        // 3. Smooth Number Rolling Countdown Tween
         numberTween?.Kill();
         numberTween = DOTween.To(() => displayedHealthValue, x =>
         {
@@ -119,11 +171,11 @@ public class PlayerHealthUI : MonoBehaviour
             UpdateTextDisplay(displayedHealthValue, cachedMaxHealth);
         }, targetHealth, numberTweenDuration).SetEase(Ease.OutQuad);
 
-        // 3. Low Ink Color Pulse Effect (<= 20% max health)
+        // 4. Low Ink Color Pulse Effect (<= 20% max health)
         bool isLowHealth = targetHealth <= (maxHealth * 0.2f);
         if (isLowHealth)
         {
-            if (lowHealthPulseTween == null || !lowHealthPulseTween.IsActive())
+            if (healthTextTMP != null && (lowHealthPulseTween == null || !lowHealthPulseTween.IsActive()))
             {
                 lowHealthPulseTween = healthTextTMP.DOColor(lowHealthColor, 0.4f)
                     .SetLoops(-1, LoopType.Yoyo)
@@ -132,7 +184,7 @@ public class PlayerHealthUI : MonoBehaviour
         }
         else
         {
-            if (lowHealthPulseTween != null && lowHealthPulseTween.IsActive())
+            if (healthTextTMP != null && lowHealthPulseTween != null && lowHealthPulseTween.IsActive())
             {
                 lowHealthPulseTween.Kill();
                 healthTextTMP.color = originalTextColor;
@@ -140,15 +192,28 @@ public class PlayerHealthUI : MonoBehaviour
         }
     }
 
+    private void UpdateBarFillInstant(float currentHealth, float maxHealth)
+    {
+        float fillRatio = Mathf.Clamp01(currentHealth / maxHealth);
+
+        if (verticalHealthFillImage != null)
+        {
+            verticalHealthFillImage.fillAmount = fillRatio;
+        }
+
+        if (verticalHealthSlider != null)
+        {
+            verticalHealthSlider.value = fillRatio;
+        }
+    }
+
     private void TriggerSubtlePunch()
     {
         if (healthTextTMP == null) return;
 
-        // Reset scale and kill active scale tweens to prevent scale compounding inflation
         healthTextTMP.transform.DOKill(true);
         healthTextTMP.transform.localScale = originalTextScale;
 
-        // Subtle punch scale pop (8% scale increase)
         punchScaleTween = healthTextTMP.transform.DOPunchScale(new Vector3(0.08f, 0.08f, 0f), 0.15f, 4, 0.5f)
             .OnComplete(() =>
             {
@@ -161,6 +226,8 @@ public class PlayerHealthUI : MonoBehaviour
 
     private void UpdateTextDisplay(float currentHealth, float maxHealth)
     {
+        if (healthTextTMP == null) return;
+
         int displayCurrent = Mathf.CeilToInt(currentHealth);
         int displayMax = Mathf.CeilToInt(maxHealth);
 
@@ -168,9 +235,6 @@ public class PlayerHealthUI : MonoBehaviour
             ? $"{prefixFormat}{displayCurrent} / {displayMax}" 
             : $"{prefixFormat}{displayCurrent}";
 
-        if (healthTextTMP != null)
-        {
-            healthTextTMP.text = textValue;
-        }
+        healthTextTMP.text = textValue;
     }
 }

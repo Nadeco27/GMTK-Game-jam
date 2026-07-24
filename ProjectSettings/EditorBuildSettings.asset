@@ -18,14 +18,29 @@ EditorBuildSettings:
     path: Assets/Scenes/Map 3.unity
     guid: 111690fd68ec062479121c4be9bf63f2
   - enabled: 1
-    path: Assets/Scenes/UIScene.unity
-    guid: f095795b70bdba34b92daa4d9868cfa3
-  - enabled: 1
     path: Assets/Scenes/Map 4.unity
     guid: cee6694a7e6414f48ac96814ad042744
   - enabled: 1
     path: Assets/Scenes/Map 5.unity
     guid: 6af600380aeec784383a97149ef6cf9c
+  - enabled: 1
+    path: Assets/Scenes/Map 6.unity
+    guid: 9829a9eb70f2f914d979e0c71b997510
+  - enabled: 1
+    path: Assets/Scenes/Map 7.unity
+    guid: c7d2e95d621fa4f41b9952d35c16411f
+  - enabled: 1
+    path: Assets/Scenes/Map 8.unity
+    guid: 3b72e77cce70bf24ea11437906d0c5ad
+  - enabled: 1
+    path: Assets/Scenes/Map 9.unity
+    guid: de5fa6d013fd9bb44b1f707e63fd87e7
+  - enabled: 1
+    path: Assets/Scenes/Map 10.unity
+    guid: a27a32148dcd22d4aa7b3c7bff562fec
+  - enabled: 1
+    path: Assets/Scenes/UIScene.unity
+    guid: f095795b70bdba34b92daa4d9868cfa3
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
