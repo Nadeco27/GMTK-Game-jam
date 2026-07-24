@@ -43,6 +43,17 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+
+        // Auto-ensure PlayerInteractor and Inventory components exist on player
+        if (GetComponent<PlayerInteractor>() == null)
+        {
+            gameObject.AddComponent<PlayerInteractor>();
+        }
+
+        if (GetComponent<Inventory>() == null)
+        {
+            gameObject.AddComponent<Inventory>();
+        }
     }
 
     private void Update()
