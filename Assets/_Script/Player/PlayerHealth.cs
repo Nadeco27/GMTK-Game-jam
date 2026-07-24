@@ -197,6 +197,13 @@ public class PlayerHealth : MonoBehaviour
         // Teleport player back to the exact initial birth position
         transform.position = initialBirthPosition;
 
+        // Clear TrailRenderer components to prevent purple teleport streaks across screen
+        TrailRenderer[] trailRenderers = GetComponentsInChildren<TrailRenderer>(true);
+        foreach (TrailRenderer tr in trailRenderers)
+        {
+            tr.Clear();
+        }
+
         // Reset player state & position for new run
         ResetHealth();
 

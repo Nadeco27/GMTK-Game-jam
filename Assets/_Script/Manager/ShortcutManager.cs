@@ -73,6 +73,16 @@ public class ShortcutManager : MonoBehaviour
                 item.CheckAndApplyPersistentShortcutState();
             }
         }
+
+        // Apply state for all CrossSceneShortcutTarget obstacles present in the newly loaded scene
+        CrossSceneShortcutTarget[] targetsInScene = FindObjectsByType<CrossSceneShortcutTarget>(FindObjectsSortMode.None);
+        foreach (CrossSceneShortcutTarget target in targetsInScene)
+        {
+            if (target != null)
+            {
+                target.CheckAndApplyState();
+            }
+        }
     }
 
     /// <summary>

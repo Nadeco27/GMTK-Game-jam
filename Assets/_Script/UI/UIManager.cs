@@ -8,15 +8,28 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class UIManager : MonoBehaviour
 {
-    public static UIManager Instance { get; private set; }
+    private static UIManager _instance;
+
+    public static UIManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = FindFirstObjectByType<UIManager>(FindObjectsInactive.Include);
+            }
+            return _instance;
+        }
+        private set => _instance = value;
+    }
 
     [Header("UI Scene Settings")]
     [Tooltip("The exact name of the dedicated UI scene added in Build Settings.")]
     [SerializeField] private string uiSceneName = "UIScene";
 
     [Header("Excluded Scenes")]
-    [Tooltip("Names of scenes where the gameplay UI should NOT be loaded (e.g. MainMenu).")]
-    [SerializeField] private List<string> nonGameplayScenes = new List<string> { "MainMenu", "Menu", "Title", "StartMenu" };
+    [Tooltip("Names of scenes where the gameplay UI should NOT be loaded (e.g. Index, MainMenu).")]
+    [SerializeField] private List<string> nonGameplayScenes = new List<string> { "Index", "MainMenu", "Menu", "Title", "StartMenu" };
 
     /// <summary>
     /// Automatically runs when Play Mode starts, ensuring UIManager exists.
@@ -33,14 +46,17 @@ public class UIManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (_instance != null && _instance != this)
         {
             Destroy(gameObject);
             return;
         }
 
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
+        _instance = this;
+        if (transform.parent == null)
+        {
+            DontDestroyOnLoad(gameObject);
+        }
 
         EnsureUISceneState();
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -48,9 +64,10 @@ public class UIManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (Instance == this)
+        if (_instance == this)
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
+            _instance = null;
         }
     }
 

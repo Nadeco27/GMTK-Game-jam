@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// Script attached to Information Items in the game world.
 /// When interacted with by the player, it opens an Info Panel showing a centered graphic.
-/// Optionally unlocks shortcuts by disabling configured GameObjects permanently across scene transitions/respawns.
+/// Optionally unlocks shortcuts by disabling configured GameObjects (same scene & cross-scene) permanently across scene transitions/respawns.
 /// </summary>
 public class ItemInfo : MonoBehaviour, IInteractable
 {
@@ -18,15 +18,19 @@ public class ItemInfo : MonoBehaviour, IInteractable
     [Tooltip("Custom prompt message displayed when in interaction range.")]
     [SerializeField] private string promptMessage = "Tekan E untuk membaca";
 
-    [Header("Shortcut Unlock Settings")]
+    [Header("Shortcut Unlock Settings (Same Scene)")]
     [Tooltip("If true, interacting with this info item will permanently open/unlock hidden shortcuts in this run.")]
     [SerializeField] private bool unlockShortcutOnInteract = false;
 
     [Tooltip("Optional custom unique ID for this shortcut. If left blank, it will automatically generate a key.")]
     [SerializeField] private string customShortcutID = "";
 
-    [Tooltip("List of GameObjects (walls, secret doors, obstacles) to disable when this shortcut is unlocked.")]
+    [Tooltip("List of GameObjects (walls, secret doors, obstacles) in THIS scene to disable when this shortcut is unlocked.")]
     [SerializeField] private List<GameObject> objectsToDisable = new List<GameObject>();
+
+    [Header("Cross-Scene Shortcut Settings")]
+    [Tooltip("List of Shortcut IDs in OTHER scenes to unlock/disable when this info item is read.")]
+    [SerializeField] private List<string> crossSceneShortcutIDsToDisable = new List<string>();
 
     public string ItemName => itemName;
     public Sprite InfoSprite => infoSprite;
@@ -61,7 +65,7 @@ public class ItemInfo : MonoBehaviour, IInteractable
     }
 
     /// <summary>
-    /// Disables all assigned shortcut GameObjects.
+    /// Disables all assigned same-scene shortcut GameObjects.
     /// </summary>
     public void ApplyShortcutUnlockedState()
     {
@@ -92,14 +96,14 @@ public class ItemInfo : MonoBehaviour, IInteractable
             Debug.LogWarning($"[ItemInfo] InfoPanelUI instance not found in scene while interacting with '{itemName}'.");
         }
 
-        if (unlockShortcutOnInteract)
+        if (unlockShortcutOnInteract || (crossSceneShortcutIDsToDisable != null && crossSceneShortcutIDsToDisable.Count > 0))
         {
             UnlockShortcut();
         }
     }
 
     /// <summary>
-    /// Unlocks the shortcut, disabling configured GameObjects and registering state with ShortcutManager.
+    /// Unlocks the shortcut, disabling configured same-scene GameObjects & cross-scene shortcut IDs in ShortcutManager.
     /// </summary>
     public void UnlockShortcut()
     {
@@ -107,7 +111,23 @@ public class ItemInfo : MonoBehaviour, IInteractable
 
         if (ShortcutManager.Instance != null)
         {
-            ShortcutManager.Instance.UnlockShortcut(GetShortcutKey());
+            // Register same-scene shortcut
+            if (unlockShortcutOnInteract)
+            {
+                ShortcutManager.Instance.UnlockShortcut(GetShortcutKey());
+            }
+
+            // Register cross-scene shortcut IDs
+            if (crossSceneShortcutIDsToDisable != null)
+            {
+                foreach (string crossID in crossSceneShortcutIDsToDisable)
+                {
+                    if (!string.IsNullOrEmpty(crossID))
+                    {
+                        ShortcutManager.Instance.UnlockShortcut(crossID);
+                    }
+                }
+            }
         }
     }
 }
