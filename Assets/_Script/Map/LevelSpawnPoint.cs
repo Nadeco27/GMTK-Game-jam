@@ -28,6 +28,13 @@ public class LevelSpawnPoint : MonoBehaviour
             {
                 player.transform.position = transform.position;
 
+                // Clear TrailRenderer components to prevent purple teleport streaks across screen
+                TrailRenderer[] trailRenderers = player.GetComponentsInChildren<TrailRenderer>(true);
+                foreach (TrailRenderer tr in trailRenderers)
+                {
+                    tr.Clear();
+                }
+
                 // Reset player health position tracker so scene teleportation doesn't count as walking distance
                 if (PlayerHealth.Instance != null)
                 {

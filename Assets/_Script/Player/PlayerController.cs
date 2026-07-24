@@ -108,4 +108,16 @@ public class PlayerController : MonoBehaviour
         localScale.x *= -1f;
         transform.localScale = localScale;
     }
+
+    /// <summary>
+    /// Instantly clears all active trail renderers on the player to prevent magenta teleport streaks across screen.
+    /// </summary>
+    public void ClearTrailRenderers()
+    {
+        TrailRenderer[] trailRenderers = GetComponentsInChildren<TrailRenderer>(true);
+        foreach (TrailRenderer tr in trailRenderers)
+        {
+            tr.Clear();
+        }
+    }
 }

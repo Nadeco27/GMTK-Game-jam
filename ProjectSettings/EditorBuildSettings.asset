@@ -30,6 +30,12 @@ EditorBuildSettings:
     path: Assets/Scenes/Map 8.unity
     guid: 3b72e77cce70bf24ea11437906d0c5ad
   - enabled: 1
+    path: Assets/Scenes/Map 9.unity
+    guid: de5fa6d013fd9bb44b1f707e63fd87e7
+  - enabled: 1
+    path: Assets/Scenes/Map 10.unity
+    guid: a27a32148dcd22d4aa7b3c7bff562fec
+  - enabled: 1
     path: Assets/Scenes/UIScene.unity
     guid: f095795b70bdba34b92daa4d9868cfa3
   m_configObjects:
