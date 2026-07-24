@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4461519336153653511}
   - component: {fileID: 6387575314542092965}
   - component: {fileID: 3915601069519825977}
-  - component: {fileID: 4595094406485607315}
+  - component: {fileID: 8555244275207846429}
   m_Layer: 0
   m_Name: Sticky Note
   m_TagString: Player
@@ -150,7 +150,7 @@ MonoBehaviour:
   objectsToDisable:
   - {fileID: 0}
   crossSceneShortcutIDsToDisable: []
---- !u!114 &4595094406485607315
+--- !u!114 &8555244275207846429
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -159,12 +159,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 4172671008734840229}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4cfe4a2fa1a59284f9d61e254f49d5f8, type: 3}
+  m_Script: {fileID: 11500000, guid: b5e8cae41cb7f5f49a26e8d44858d976, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FloatingInteractionPrompt
-  promptVisual: {fileID: 4701657313255991248}
-  floatSpeed: 1.5
-  floatAmplitude: 0.02
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSway
+  maxSwayAngle: 12
+  swaySpeed: 3
+  targetTransform: {fileID: 4344354475424100337}
 --- !u!1 &4701657313255991248
 GameObject:
   m_ObjectHideFlags: 0
@@ -175,6 +175,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7754973697610730630}
   - component: {fileID: 3798000178446141291}
+  - component: {fileID: 3646465072801768749}
   m_Layer: 0
   m_Name: KeyEPrompt
   m_TagString: Untagged
@@ -255,3 +256,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &3646465072801768749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4701657313255991248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cfe4a2fa1a59284f9d61e254f49d5f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FloatingInteractionPrompt
+  promptVisual: {fileID: 4701657313255991248}
+  floatSpeed: 1.5
+  floatAmplitude: 0.02

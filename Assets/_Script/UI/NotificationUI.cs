@@ -4,8 +4,8 @@ using TMPro;
 using System.Collections;
 
 /// <summary>
-/// Singleton UI manager for displaying bottom-right item notifications.
-/// Automatically handles inactive scene object lookup and icon/text population.
+/// General action text-only Notification UI manager using TextMeshPro (TMP_Text).
+/// Allows modular 1-line calls from anywhere in the codebase (e.g. NotificationUI.ShowNotification("Message")).
 /// </summary>
 public class NotificationUI : MonoBehaviour
 {
@@ -15,7 +15,7 @@ public class NotificationUI : MonoBehaviour
     {
         get
         {
-            if (_instance == null)
+            if (_instance == null || _instance.gameObject == null)
             {
                 _instance = FindFirstObjectByType<NotificationUI>(FindObjectsInactive.Include);
             }
@@ -25,43 +25,32 @@ public class NotificationUI : MonoBehaviour
     }
 
     [Header("UI References")]
-    [Tooltip("The panel container for the item notification.")]
+    [Tooltip("The panel container for the notification.")]
     public GameObject panel;
 
-    [Tooltip("Text component displaying the notification message.")]
+    [Tooltip("TextMeshPro text component displaying the notification message.")]
     public TMP_Text textNotification;
 
-    [Tooltip("Image component displaying the item sprite icon.")]
-    public Image itemIconImage;
+    [Header("Notification Settings")]
+    [Tooltip("Duration in seconds the notification stays on screen.")]
+    [SerializeField] private float displayDuration = 2.5f;
+
+    private Coroutine currentDisplayRoutine;
 
     private void Awake()
     {
         if (_instance != null && _instance != this)
         {
-            // If existing Instance has no panel assigned, but THIS instance has panel assigned:
-            if (_instance.panel == null && this.panel != null)
-            {
-                Destroy(_instance); // Remove the old empty script component
-                _instance = this;
-                if (transform.parent == null)
-                {
-                    DontDestroyOnLoad(gameObject);
-                }
-            }
-            else
-            {
-                // Destroy ONLY this duplicate script component, NEVER the GameObject or its child UI elements
-                Destroy(this);
-                return;
-            }
+            // If duplicate NotificationUI exists in scene, destroy the duplicate GameObject
+            // to prevent duplicate Canvas panels with static default text from remaining on screen.
+            Destroy(gameObject);
+            return;
         }
-        else
+
+        _instance = this;
+        if (transform.parent == null)
         {
-            _instance = this;
-            if (transform.parent == null)
-            {
-                DontDestroyOnLoad(gameObject);
-            }
+            DontDestroyOnLoad(gameObject);
         }
 
         AutoLinkReferences();
@@ -84,22 +73,36 @@ public class NotificationUI : MonoBehaviour
             textNotification = GetComponentInChildren<TMP_Text>(true);
         }
 
-        if (itemIconImage == null)
+        // Hide any existing image icon components as NotificationUI is text-only
+        Image[] images = GetComponentsInChildren<Image>(true);
+        foreach (Image img in images)
         {
-            Image[] images = GetComponentsInChildren<Image>(true);
-            foreach (Image img in images)
+            if (panel != null && img.gameObject != panel)
             {
-                if (panel != null && img.gameObject != panel)
-                {
-                    itemIconImage = img;
-                    break;
-                }
+                img.gameObject.SetActive(false);
             }
         }
     }
 
     /// <summary>
-    /// Displays the item notification panel with text message and optional sprite icon for 2 seconds.
+    /// Static 1-line modular call to display any text notification in the game.
+    /// Example: NotificationUI.ShowNotification("Item Red Key added to backpack.");
+    /// </summary>
+    public static void ShowNotification(string message)
+    {
+        if (Instance != null)
+        {
+            Instance.Show(message);
+        }
+        else
+        {
+            Debug.Log($"[NotificationUI] {message}");
+        }
+    }
+
+    /// <summary>
+    /// Displays text-only action notification for the configured duration.
+    /// Overload maintained for backwards compatibility.
     /// </summary>
     public void Show(string message, Sprite icon = null)
     {
@@ -110,43 +113,51 @@ public class NotificationUI : MonoBehaviour
 
         AutoLinkReferences();
 
-        StopAllCoroutines();
-        StartCoroutine(ShowRoutine(message, icon));
+        if (currentDisplayRoutine != null)
+        {
+            StopCoroutine(currentDisplayRoutine);
+        }
+
+        currentDisplayRoutine = StartCoroutine(ShowRoutine(message));
     }
 
-    private IEnumerator ShowRoutine(string message, Sprite icon)
+    private IEnumerator ShowRoutine(string message)
     {
         if (panel != null)
         {
             panel.SetActive(true);
         }
 
+        // 1. Primary update on assigned or auto-found TextMeshPro component
         if (textNotification != null)
         {
             textNotification.text = message;
+            textNotification.SetText(message);
             textNotification.gameObject.SetActive(true);
+            textNotification.ForceMeshUpdate();
         }
 
-        if (itemIconImage != null)
+        // 2. Fallback update across all child TMP_Text components inside panel
+        GameObject container = panel != null ? panel : gameObject;
+        TMP_Text[] tmps = container.GetComponentsInChildren<TMP_Text>(true);
+        foreach (var tmp in tmps)
         {
-            if (icon != null)
+            if (tmp != null)
             {
-                itemIconImage.sprite = icon;
-                itemIconImage.enabled = true;
-                itemIconImage.gameObject.SetActive(true);
-            }
-            else
-            {
-                itemIconImage.enabled = false;
-                itemIconImage.gameObject.SetActive(false);
+                tmp.text = message;
+                tmp.SetText(message);
+                tmp.gameObject.SetActive(true);
+                tmp.ForceMeshUpdate();
             }
         }
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(displayDuration);
 
         if (panel != null)
         {
             panel.SetActive(false);
         }
+
+        currentDisplayRoutine = null;
     }
 }

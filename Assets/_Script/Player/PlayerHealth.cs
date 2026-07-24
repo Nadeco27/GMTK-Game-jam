@@ -176,6 +176,10 @@ public class PlayerHealth : MonoBehaviour
         // Reset level connection so door spawn points are not triggered on respawn
         LevelConnection.ActiveConnection = null;
 
+        // Clear Inventory and Hotbar items on death
+        if (Inventory.Instance != null) Inventory.Instance.Clear();
+        if (Hotbar.Instance != null) Hotbar.Instance.Clear();
+
         string targetScene = string.IsNullOrEmpty(initialBirthSceneName) ? fallbackSceneName : initialBirthSceneName;
 
         // Fade screen out and load initial birth scene

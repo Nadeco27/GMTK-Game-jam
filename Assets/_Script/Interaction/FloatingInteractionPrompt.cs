@@ -1,14 +1,14 @@
 using UnityEngine;
 
 /// <summary>
-/// Component attached to an E-key prompt icon (or item object) in the scene.
-/// Automatically handles showing/hiding the prompt based on player proximity and InfoPanelUI state,
-/// and applies a smooth floating (up and down) animation.
+/// Component attached to an E-key prompt icon in the scene.
+/// Automatically handles showing/hiding the prompt based on player proximity,
+/// locks X-axis left/right movement from parent sway, and animates vertical bobbing.
 /// </summary>
 public class FloatingInteractionPrompt : MonoBehaviour
 {
     [Header("Prompt Visual Reference")]
-    [Tooltip("The GameObject or SpriteRenderer of the E-key prompt icon. Defaults to this GameObject if unassigned.")]
+    [Tooltip("The GameObject or SpriteRenderer of the E-key prompt icon. Defaults to child visual or SpriteRenderer if unassigned.")]
     [SerializeField] private GameObject promptVisual;
 
     [Header("Floating Animation Settings")]
@@ -18,16 +18,13 @@ public class FloatingInteractionPrompt : MonoBehaviour
     [Tooltip("Vertical height offset amplitude for floating.")]
     [SerializeField] private float floatAmplitude = 0.12f;
 
-    private Vector3 initialLocalPosition;
+    private Vector3 initialWorldOffset;
     private IInteractable targetInteractable;
+    private SpriteRenderer promptSpriteRenderer;
+    private float currentYBobbingOffset = 0f;
 
     private void Awake()
     {
-        if (promptVisual == null)
-        {
-            promptVisual = gameObject;
-        }
-
         // Search for IInteractable on this object or parent
         targetInteractable = GetComponentInParent<IInteractable>();
         if (targetInteractable == null)
@@ -35,7 +32,30 @@ public class FloatingInteractionPrompt : MonoBehaviour
             targetInteractable = GetComponent<IInteractable>();
         }
 
-        initialLocalPosition = promptVisual.transform.localPosition;
+        // If promptVisual is not set, try to use child visual or this gameObject
+        if (promptVisual == null)
+        {
+            if (transform.childCount > 0)
+            {
+                promptVisual = transform.GetChild(0).gameObject;
+            }
+            else
+            {
+                promptVisual = gameObject;
+            }
+        }
+
+        promptSpriteRenderer = promptVisual.GetComponent<SpriteRenderer>();
+
+        // Record initial world offset relative to parent so editor placement is preserved 1:1
+        if (transform.parent != null)
+        {
+            initialWorldOffset = transform.position - transform.parent.position;
+        }
+        else
+        {
+            initialWorldOffset = transform.position;
+        }
 
         // Hide prompt initially
         SetPromptVisible(false);
@@ -61,6 +81,22 @@ public class FloatingInteractionPrompt : MonoBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        // 1. Lock World Rotation so prompt stays upright
+        transform.rotation = Quaternion.identity;
+
+        // 2. Maintain exact initial position offset set in Editor, avoiding sway rotation & scale displacement
+        if (transform.parent != null)
+        {
+            transform.position = transform.parent.position + initialWorldOffset + new Vector3(0f, currentYBobbingOffset, 0f);
+        }
+        else
+        {
+            transform.position = initialWorldOffset + new Vector3(0f, currentYBobbingOffset, 0f);
+        }
+    }
+
     private bool ShouldShowPrompt()
     {
         // 1. Hide if PlayerInteractor is missing or interactions are disabled (e.g. while InfoPanelUI is open)
@@ -75,7 +111,7 @@ public class FloatingInteractionPrompt : MonoBehaviour
             return false;
         }
 
-        // 3. Check if target interactable is in player range and is the closest interactable
+        // 3. Check if target interactable is in player range and is closest
         if (targetInteractable != null)
         {
             if (!targetInteractable.CanInteract(PlayerInteractor.Instance.gameObject))
@@ -89,15 +125,13 @@ public class FloatingInteractionPrompt : MonoBehaviour
                 return true;
             }
         }
-        else
+
+        // Proximity fallback check
+        if (PlayerInteractor.Instance != null)
         {
-            // Proximity fallback check if prompt is placed standalone in scene
             float distSqr = (transform.position - PlayerInteractor.Instance.transform.position).sqrMagnitude;
             float radius = PlayerInteractor.Instance.InteractRadius;
-            if (distSqr <= radius * radius)
-            {
-                return true;
-            }
+            return distSqr <= radius * radius;
         }
 
         return false;
@@ -105,16 +139,28 @@ public class FloatingInteractionPrompt : MonoBehaviour
 
     private void AnimateFloating()
     {
-        if (promptVisual == null) return;
-        float yOffset = Mathf.Sin(Time.time * floatSpeed) * floatAmplitude;
-        promptVisual.transform.localPosition = initialLocalPosition + new Vector3(0f, yOffset, 0f);
+        currentYBobbingOffset = Mathf.Sin(Time.time * floatSpeed) * floatAmplitude;
     }
 
     private void SetPromptVisible(bool visible)
     {
-        if (promptVisual != null && promptVisual.activeSelf != visible)
+        if (promptVisual != null)
         {
-            promptVisual.SetActive(visible);
+            if (promptVisual == gameObject)
+            {
+                // If promptVisual is the same GameObject, toggle SpriteRenderer to avoid disabling this script
+                if (promptSpriteRenderer != null)
+                {
+                    promptSpriteRenderer.enabled = visible;
+                }
+            }
+            else
+            {
+                if (promptVisual.activeSelf != visible)
+                {
+                    promptVisual.SetActive(visible);
+                }
+            }
         }
     }
 }

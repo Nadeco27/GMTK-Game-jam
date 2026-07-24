@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class CrossSceneDoor : MonoBehaviour
 {
+    private static readonly HashSet<string> openedDoorIDs = new HashSet<string>();
+
     [System.Serializable]
     public struct ButtonRequirement
     {
@@ -19,12 +21,30 @@ public class CrossSceneDoor : MonoBehaviour
 
     [Header("Door Components")]
     public Collider2D doorCollider;
-    public Animator doorAnimator; // Gunakan animator yang sudah Anda buat sebelumnya
+    public SpriteRenderer doorRenderer;
+    public Animator doorAnimator; // Optional (jika pintu tidak pakai animasi, bisa dikosongkan)
+    [Tooltip("Jika di-centang, GameObject pintu akan di-disable saat terbuka")]
+    public bool disableGameObjectOnOpen = false;
     
     private bool isOpen = false;
 
+    private string GetDoorID()
+    {
+        return $"{gameObject.scene.name}_{gameObject.name}_{transform.position.x:F2}_{transform.position.y:F2}";
+    }
+
+    private void Start()
+    {
+        if (openedDoorIDs.Contains(GetDoorID()))
+        {
+            OpenDoor();
+        }
+    }
+
     private void Update()
     {
+        if (isOpen) return; // If already unlocked persistently, stay open
+
         if (InkTrailManager.Instance == null) return;
 
         bool allButtonsPressed = true;
@@ -44,31 +64,41 @@ public class CrossSceneDoor : MonoBehaviour
         {
             OpenDoor();
         }
-        else if (!allButtonsPressed && isOpen)
-        {
-            CloseDoor();
-        }
     }
 
     private void OpenDoor()
     {
         isOpen = true;
+        openedDoorIDs.Add(GetDoorID());
+
         if (doorCollider != null) doorCollider.enabled = false;
+        if (doorRenderer != null) doorRenderer.enabled = false;
         
         if (doorAnimator != null) 
         {
-            doorAnimator.SetBool("IsOpen", true); // Sesuaikan dengan parameter animasi Anda
+            doorAnimator.SetBool("IsOpen", true);
+        }
+
+        if (disableGameObjectOnOpen)
+        {
+            gameObject.SetActive(false);
         }
     }
 
     private void CloseDoor()
     {
         isOpen = false;
+        if (disableGameObjectOnOpen)
+        {
+            gameObject.SetActive(true);
+        }
+
         if (doorCollider != null) doorCollider.enabled = true;
+        if (doorRenderer != null) doorRenderer.enabled = true;
         
         if (doorAnimator != null) 
         {
-            doorAnimator.SetBool("IsOpen", false); // Sesuaikan dengan parameter animasi Anda
+            doorAnimator.SetBool("IsOpen", false);
         }
     }
 }
