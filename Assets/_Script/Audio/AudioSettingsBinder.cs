@@ -1,0 +1,85 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+/// <summary>
+/// Helper component that binds UI Sliders (Master, Music, SFX) to AudioManager volume controls.
+/// Attach this script to your Settings Panel or Canvas GameObject containing UI sliders.
+/// </summary>
+public class AudioSettingsBinder : MonoBehaviour
+{
+    [Header("UI Slider References")]
+    [Tooltip("UI Slider for Master Volume (0.0 to 1.0).")]
+    [SerializeField] private Slider masterSlider;
+
+    [Tooltip("UI Slider for Music Volume (0.0 to 1.0).")]
+    [SerializeField] private Slider musicSlider;
+
+    [Tooltip("UI Slider for SFX Volume (0.0 to 1.0).")]
+    [SerializeField] private Slider sfxSlider;
+
+    private void Start()
+    {
+        InitializeSliders();
+    }
+
+    private void OnEnable()
+    {
+        InitializeSliders();
+    }
+
+    public void InitializeSliders()
+    {
+        if (AudioManager.Instance == null) return;
+
+        if (masterSlider != null)
+        {
+            masterSlider.minValue = 0.0001f;
+            masterSlider.maxValue = 1f;
+            masterSlider.value = AudioManager.Instance.GetMasterVolume();
+            masterSlider.onValueChanged.RemoveAllListeners();
+            masterSlider.onValueChanged.AddListener(OnMasterSliderChanged);
+        }
+
+        if (musicSlider != null)
+        {
+            musicSlider.minValue = 0.0001f;
+            musicSlider.maxValue = 1f;
+            musicSlider.value = AudioManager.Instance.GetMusicVolume();
+            musicSlider.onValueChanged.RemoveAllListeners();
+            musicSlider.onValueChanged.AddListener(OnMusicSliderChanged);
+        }
+
+        if (sfxSlider != null)
+        {
+            sfxSlider.minValue = 0.0001f;
+            sfxSlider.maxValue = 1f;
+            sfxSlider.value = AudioManager.Instance.GetSFXVolume();
+            sfxSlider.onValueChanged.RemoveAllListeners();
+            sfxSlider.onValueChanged.AddListener(OnSFXSliderChanged);
+        }
+    }
+
+    private void OnMasterSliderChanged(float val)
+    {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.SetMasterVolume(val);
+        }
+    }
+
+    private void OnMusicSliderChanged(float val)
+    {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.SetMusicVolume(val);
+        }
+    }
+
+    private void OnSFXSliderChanged(float val)
+    {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.SetSFXVolume(val);
+        }
+    }
+}
