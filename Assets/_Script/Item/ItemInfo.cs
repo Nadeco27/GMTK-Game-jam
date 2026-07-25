@@ -94,6 +94,11 @@ public class ItemInfo : MonoBehaviour, IInteractable
 
     public void Interact(GameObject interactor)
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("paper_pickup");
+        }
+
         if (InfoPanelUI.Instance != null)
         {
             string notificationText = showNotificationOnClose ? notificationMessage : null;

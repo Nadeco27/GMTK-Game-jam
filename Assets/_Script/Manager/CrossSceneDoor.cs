@@ -49,7 +49,7 @@ public class CrossSceneDoor : MonoBehaviour
     {
         if (openedDoorIDs.Contains(GetDoorID()))
         {
-            OpenDoor();
+            OpenDoor(isInitialLoad: true);
         }
     }
 
@@ -74,7 +74,7 @@ public class CrossSceneDoor : MonoBehaviour
         // Eksekusi Pintu
         if (allButtonsPressed && !isOpen)
         {
-            OpenDoor();
+            OpenDoor(isInitialLoad: false);
         }
     }
 
@@ -105,10 +105,15 @@ public class CrossSceneDoor : MonoBehaviour
         }
     }
 
-    private void OpenDoor()
+    private void OpenDoor(bool isInitialLoad = false)
     {
         isOpen = true;
         openedDoorIDs.Add(GetDoorID());
+
+        if (!isInitialLoad)
+        {
+            StartCoroutine(PlayDoorOpenSFXWithDelay(0.3f));
+        }
 
         if (doorCollider != null) doorCollider.enabled = false;
         if (doorRenderer != null) doorRenderer.enabled = false;
@@ -121,6 +126,15 @@ public class CrossSceneDoor : MonoBehaviour
         if (disableGameObjectOnOpen)
         {
             gameObject.SetActive(false);
+        }
+    }
+
+    private System.Collections.IEnumerator PlayDoorOpenSFXWithDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("door_open");
         }
     }
 

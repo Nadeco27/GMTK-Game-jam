@@ -244,6 +244,11 @@ public class InfoPanelUI : MonoBehaviour
     /// </summary>
     public void ClosePanel()
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("button_click");
+        }
+
         if (panel != null)
         {
             panel.SetActive(false);

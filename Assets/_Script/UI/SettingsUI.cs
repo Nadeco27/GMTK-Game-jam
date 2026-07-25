@@ -58,6 +58,11 @@ public class SettingsUI : MonoBehaviour
 
     public void OpenSettings()
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("button_click");
+        }
+
         if (SettingsPanel != null)
         {
             SettingsPanel.SetActive(true);
@@ -67,6 +72,11 @@ public class SettingsUI : MonoBehaviour
 
     public void CloseSettings()
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("button_click");
+        }
+
         if (SettingsPanel != null)
         {
             SettingsPanel.SetActive(false);
@@ -76,6 +86,11 @@ public class SettingsUI : MonoBehaviour
 
     public void goToMainMenu()
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("button_click");
+        }
+
         // Load the Main Menu scene
         UnityEngine.SceneManagement.SceneManager.LoadScene(SceneName);
         Time.timeScale = 1f;

@@ -103,6 +103,8 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
+        StartCoroutine(ApplyInitialVolumesRoutine());
+
         if (autoPlayMusicOnStart)
         {
             if (playRandomMusicOnStart)
@@ -114,6 +116,16 @@ public class AudioManager : MonoBehaviour
                 PlayMusic(defaultMusicID, 0.5f);
             }
         }
+    }
+
+    private IEnumerator ApplyInitialVolumesRoutine()
+    {
+        // Wait 1 frame until Unity AudioMixer finishes initializing exposed parameters internally
+        yield return null;
+
+        SetMasterVolume(GetMasterVolume());
+        SetMusicVolume(GetMusicVolume());
+        SetSFXVolume(GetSFXVolume());
     }
 
     private void Update()
@@ -398,28 +410,47 @@ public class AudioManager : MonoBehaviour
 
     #region AudioMixer Volume Control API
 
+    private const string PREF_MASTER_VOLUME = "Audio_MasterVolume";
+    private const string PREF_MUSIC_VOLUME = "Audio_MusicVolume";
+    private const string PREF_SFX_VOLUME = "Audio_SFXVolume";
+
+    public static event System.Action<string, float> OnVolumeChanged;
+
     /// <summary>
-    /// Sets Master Volume (0.0 to 1.0 linear slider value). Converts internally to dB.
+    /// Sets Master Volume (0.0 to 1.0 linear slider value). Converts internally to dB and saves preference.
+    /// Default on first launch is 0.3f (30%).
     /// </summary>
     public void SetMasterVolume(float linearVolume)
     {
+        linearVolume = Mathf.Clamp01(linearVolume);
         SetMixerVolume(masterVolumeParam, linearVolume);
+        PlayerPrefs.SetFloat(PREF_MASTER_VOLUME, linearVolume);
+        PlayerPrefs.Save();
+        OnVolumeChanged?.Invoke(masterVolumeParam, linearVolume);
     }
 
     /// <summary>
-    /// Sets Music Volume (0.0 to 1.0 linear slider value). Converts internally to dB.
+    /// Sets Music Volume (0.0 to 1.0 linear slider value). Converts internally to dB and saves preference.
     /// </summary>
     public void SetMusicVolume(float linearVolume)
     {
+        linearVolume = Mathf.Clamp01(linearVolume);
         SetMixerVolume(musicVolumeParam, linearVolume);
+        PlayerPrefs.SetFloat(PREF_MUSIC_VOLUME, linearVolume);
+        PlayerPrefs.Save();
+        OnVolumeChanged?.Invoke(musicVolumeParam, linearVolume);
     }
 
     /// <summary>
-    /// Sets SFX Volume (0.0 to 1.0 linear slider value). Converts internally to dB.
+    /// Sets SFX Volume (0.0 to 1.0 linear slider value). Converts internally to dB and saves preference.
     /// </summary>
     public void SetSFXVolume(float linearVolume)
     {
+        linearVolume = Mathf.Clamp01(linearVolume);
         SetMixerVolume(sfxVolumeParam, linearVolume);
+        PlayerPrefs.SetFloat(PREF_SFX_VOLUME, linearVolume);
+        PlayerPrefs.Save();
+        OnVolumeChanged?.Invoke(sfxVolumeParam, linearVolume);
     }
 
     private void SetMixerVolume(string parameterName, float linearVolume)
@@ -432,19 +463,19 @@ public class AudioManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Gets Master Volume linear value (0.0 to 1.0).
+    /// Gets Master Volume linear value (0.0 to 1.0). Default on first launch is 0.3f (30%).
     /// </summary>
-    public float GetMasterVolume() => GetMixerVolume(masterVolumeParam);
+    public float GetMasterVolume() => PlayerPrefs.GetFloat(PREF_MASTER_VOLUME, 0.3f);
 
     /// <summary>
-    /// Gets Music Volume linear value (0.0 to 1.0).
+    /// Gets Music Volume linear value (0.0 to 1.0). Default on first launch is 0.3f (30%).
     /// </summary>
-    public float GetMusicVolume() => GetMixerVolume(musicVolumeParam);
+    public float GetMusicVolume() => PlayerPrefs.GetFloat(PREF_MUSIC_VOLUME, 0.3f);
 
     /// <summary>
-    /// Gets SFX Volume linear value (0.0 to 1.0).
+    /// Gets SFX Volume linear value (0.0 to 1.0). Default on first launch is 0.3f (30%).
     /// </summary>
-    public float GetSFXVolume() => GetMixerVolume(sfxVolumeParam);
+    public float GetSFXVolume() => PlayerPrefs.GetFloat(PREF_SFX_VOLUME, 0.3f);
 
     private float GetMixerVolume(string parameterName)
     {

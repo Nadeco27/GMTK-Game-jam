@@ -25,6 +25,28 @@ public class AudioSettingsBinder : MonoBehaviour
     private void OnEnable()
     {
         InitializeSliders();
+        AudioManager.OnVolumeChanged += HandleVolumeChanged;
+    }
+
+    private void OnDisable()
+    {
+        AudioManager.OnVolumeChanged -= HandleVolumeChanged;
+    }
+
+    private void HandleVolumeChanged(string paramName, float val)
+    {
+        if (paramName == "MasterVolume" && masterSlider != null && !Mathf.Approximately(masterSlider.value, val))
+        {
+            masterSlider.value = val;
+        }
+        else if (paramName == "MusicVolume" && musicSlider != null && !Mathf.Approximately(musicSlider.value, val))
+        {
+            musicSlider.value = val;
+        }
+        else if (paramName == "SFXVolume" && sfxSlider != null && !Mathf.Approximately(sfxSlider.value, val))
+        {
+            sfxSlider.value = val;
+        }
     }
 
     public void InitializeSliders()
@@ -33,7 +55,7 @@ public class AudioSettingsBinder : MonoBehaviour
 
         if (masterSlider != null)
         {
-            masterSlider.minValue = 0.0001f;
+            masterSlider.minValue = 0f;
             masterSlider.maxValue = 1f;
             masterSlider.value = AudioManager.Instance.GetMasterVolume();
             masterSlider.onValueChanged.RemoveAllListeners();
@@ -42,7 +64,7 @@ public class AudioSettingsBinder : MonoBehaviour
 
         if (musicSlider != null)
         {
-            musicSlider.minValue = 0.0001f;
+            musicSlider.minValue = 0f;
             musicSlider.maxValue = 1f;
             musicSlider.value = AudioManager.Instance.GetMusicVolume();
             musicSlider.onValueChanged.RemoveAllListeners();
@@ -51,7 +73,7 @@ public class AudioSettingsBinder : MonoBehaviour
 
         if (sfxSlider != null)
         {
-            sfxSlider.minValue = 0.0001f;
+            sfxSlider.minValue = 0f;
             sfxSlider.maxValue = 1f;
             sfxSlider.value = AudioManager.Instance.GetSFXVolume();
             sfxSlider.onValueChanged.RemoveAllListeners();

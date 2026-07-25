@@ -19,6 +19,8 @@ public class InkButtonVisual : MonoBehaviour
     public Color pressedColor = new Color(0.3f, 0.3f, 0.3f, 1.0f); // Gelap saat ditekan
 
     private SpriteRenderer sr;
+    private bool wasPressed = false;
+    private bool hasInitializedState = false;
 
     private void Awake()
     {
@@ -30,12 +32,41 @@ public class InkButtonVisual : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        InitializeInitialState();
+    }
+
+    private void InitializeInitialState()
+    {
+        if (!hasInitializedState && InkTrailManager.Instance != null)
+        {
+            wasPressed = InkTrailManager.Instance.CheckInkNearPosition(gameObject.scene.name, transform.position, checkRadius);
+            hasInitializedState = true;
+        }
+    }
+
     private void Update()
     {
         if (InkTrailManager.Instance == null || sr == null) return;
 
+        if (!hasInitializedState)
+        {
+            InitializeInitialState();
+        }
+
         // Mengecek posisi tinta di scene tempat button ini berada
         bool isPressed = InkTrailManager.Instance.CheckInkNearPosition(gameObject.scene.name, transform.position, checkRadius);
+
+        // Trigger button_press SFX when button state transitions to pressed during active gameplay
+        if (isPressed && !wasPressed)
+        {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFX("button_press");
+            }
+        }
+        wasPressed = isPressed;
         
         // Ubah gambar sprite button HANYA jika fitur changeSpriteOnPress diaktifkan
         if (changeSpriteOnPress && pressedSprite != null)

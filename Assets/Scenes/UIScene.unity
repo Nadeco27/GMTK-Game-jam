@@ -1940,7 +1940,7 @@ GameObject:
   - component: {fileID: 1107742608}
   - component: {fileID: 1107742607}
   m_Layer: 0
-  m_Name: AudioManager
+  m_Name: AudioManager (DDOL)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1989,7 +1989,75 @@ MonoBehaviour:
     pitchRandomRange: 0
     basePitch: 1
     loop: 0
+  - soundID: button_click
+    audioFile: {fileID: 8300000, guid: 1e7d1ae8277bc2f469580788229a893f, type: 3}
+    soundType: 1
+    volume: 0.5
+    useRandomPitch: 0
+    pitchRandomRange: 0
+    basePitch: 1
+    loop: 0
+  - soundID: button_press
+    audioFile: {fileID: 8300000, guid: 9eaf6e9eecfcef6438e6bf0973739172, type: 3}
+    soundType: 1
+    volume: 0.5
+    useRandomPitch: 1
+    pitchRandomRange: 0.1
+    basePitch: 1
+    loop: 0
+  - soundID: door_open
+    audioFile: {fileID: 8300000, guid: 74880506934fbee448e2c6ab2e96fadd, type: 3}
+    soundType: 1
+    volume: 0.5
+    useRandomPitch: 1
+    pitchRandomRange: 0.1
+    basePitch: 1
+    loop: 0
+  - soundID: ink_dead
+    audioFile: {fileID: 8300000, guid: 57f055dc26f278f418a90176399ba3ec, type: 3}
+    soundType: 1
+    volume: 0.5
+    useRandomPitch: 0
+    pitchRandomRange: 0.1
+    basePitch: 1
+    loop: 0
+  - soundID: ink_live
+    audioFile: {fileID: 8300000, guid: 8850e4efeff1cf640917b2a3a560edd3, type: 3}
+    soundType: 1
+    volume: 0.5
+    useRandomPitch: 0
+    pitchRandomRange: 0.1
+    basePitch: 1
+    loop: 0
+  - soundID: key_pickup
+    audioFile: {fileID: 8300000, guid: a58c8f92cc1b5a242b650100145a4f39, type: 3}
+    soundType: 1
+    volume: 0.5
+    useRandomPitch: 0
+    pitchRandomRange: 0.1
+    basePitch: 1
+    loop: 0
+  - soundID: paper_pickup
+    audioFile: {fileID: 8300000, guid: ff537e43294ef584185dea2378301280, type: 3}
+    soundType: 1
+    volume: 0.5
+    useRandomPitch: 0
+    pitchRandomRange: 0.1
+    basePitch: 1
+    loop: 0
+  - soundID: win_sfx
+    audioFile: {fileID: 8300000, guid: 14b22615cfafd4847bc27474e62bac13, type: 3}
+    soundType: 1
+    volume: 0.5
+    useRandomPitch: 0
+    pitchRandomRange: 0.1
+    basePitch: 1
+    loop: 0
   defaultCrossfadeDuration: 1.2
+  autoPlayMusicOnStart: 1
+  playRandomMusicOnStart: 1
+  defaultMusicID: 
+  autoPlayNextMusicWhenEnded: 1
 --- !u!4 &1107742608
 Transform:
   m_ObjectHideFlags: 0

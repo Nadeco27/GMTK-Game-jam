@@ -152,9 +152,17 @@ public class KeyDoor : MonoBehaviour
 
     private void ApplyOpenState(bool isInitialLoad)
     {
-        if (!isInitialLoad && !string.IsNullOrEmpty(openSuccessMessage))
+        if (!isInitialLoad)
         {
-            NotificationUI.ShowNotification(openSuccessMessage);
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFX("door_open");
+            }
+
+            if (!string.IsNullOrEmpty(openSuccessMessage))
+            {
+                NotificationUI.ShowNotification(openSuccessMessage);
+            }
         }
 
         if (disableGameObjectOnOpen)

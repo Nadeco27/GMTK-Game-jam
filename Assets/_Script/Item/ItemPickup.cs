@@ -77,6 +77,11 @@ public class ItemPickup : MonoBehaviour, IInteractable
         string itemNameStr = item != null && !string.IsNullOrEmpty(item.itemName) ? item.itemName : gameObject.name;
         NotificationUI.ShowNotification($"Item {itemNameStr} added to backpack.");
 
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("key_pickup");
+        }
+
 
         
         // // Track item for respawn on player death and disable

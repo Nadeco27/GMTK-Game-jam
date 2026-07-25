@@ -153,6 +153,12 @@ public class PlayerHealth : MonoBehaviour
         if (IsDead) return;
 
         IsDead = true;
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("ink_dead");
+        }
+
         OnPlayerDied?.Invoke();
 
         // Lock player controller and stop movement
@@ -214,6 +220,11 @@ public class PlayerHealth : MonoBehaviour
 
         // Reset player state & position for new run
         ResetHealth();
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("ink_live");
+        }
 
         if (PlayerController.Instance != null)
         {

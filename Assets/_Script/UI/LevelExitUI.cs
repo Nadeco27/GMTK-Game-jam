@@ -181,6 +181,11 @@ public class LevelExitUI : MonoBehaviour
         }
 
         // 3. Display Exit Panel with Fun Celebratory Animation
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("win_sfx");
+        }
+
         if (panel != null)
         {
             panel.SetActive(true);
@@ -253,6 +258,11 @@ public class LevelExitUI : MonoBehaviour
     /// </summary>
     public void OnReturnToMainMenuClicked()
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("button_click");
+        }
+
         // Interactive punch scale feedback on button click
         if (returnToMainMenuButton != null && useDOTween)
         {
