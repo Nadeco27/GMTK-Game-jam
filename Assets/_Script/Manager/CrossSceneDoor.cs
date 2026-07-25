@@ -25,20 +25,41 @@ public class CrossSceneDoor : MonoBehaviour
     public Animator doorAnimator; // Optional (jika pintu tidak pakai animasi, bisa dikosongkan)
     [Tooltip("Jika di-centang, GameObject pintu akan di-disable saat terbuka")]
     public bool disableGameObjectOnOpen = false;
+
+    [Header("Notification Settings")]
+    [Tooltip("Pesan notifikasi yang tampil saat player bertabrakan dengan pintu yang belum terbuka.")]
+    [SerializeField] private string lockedNotificationMessage = "It won't budge.";
     
     private bool isOpen = false;
+    private float nextNotificationTime = 0f;
 
     private string GetDoorID()
     {
         return $"{gameObject.scene.name}_{gameObject.name}_{transform.position.x:F2}_{transform.position.y:F2}";
     }
 
+    private void Awake()
+    {
+        if (doorCollider == null) doorCollider = GetComponent<Collider2D>();
+        if (doorRenderer == null) doorRenderer = GetComponent<SpriteRenderer>();
+        if (doorAnimator == null) doorAnimator = GetComponent<Animator>();
+    }
+
     private void Start()
     {
         if (openedDoorIDs.Contains(GetDoorID()))
         {
-            OpenDoor();
+            OpenDoor(isInitialLoad: true);
         }
+    }
+
+    /// <summary>
+    /// Resets all opened cross-scene doors. Called when starting a new game from Main Menu.
+    /// </summary>
+    public static void ResetOpenedDoors()
+    {
+        openedDoorIDs.Clear();
+        Debug.Log("[CrossSceneDoor] Reset all opened cross-scene doors for a new game.");
     }
 
     private void Update()
@@ -62,14 +83,50 @@ public class CrossSceneDoor : MonoBehaviour
         // Eksekusi Pintu
         if (allButtonsPressed && !isOpen)
         {
-            OpenDoor();
+            OpenDoor(isInitialLoad: false);
         }
     }
 
-    private void OpenDoor()
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        HandlePlayerCollision(collision.gameObject);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        HandlePlayerCollision(collider.gameObject);
+    }
+
+    private void HandlePlayerCollision(GameObject targetObj)
+    {
+        if (isOpen) return;
+
+        if (targetObj.CompareTag("Player") || targetObj.GetComponent<PlayerController>() != null)
+        {
+            if (Time.time >= nextNotificationTime)
+            {
+                nextNotificationTime = Time.time + 2.0f;
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySFX("fail_buzz");
+                }
+                if (!string.IsNullOrEmpty(lockedNotificationMessage))
+                {
+                    NotificationUI.ShowNotification(lockedNotificationMessage);
+                }
+            }
+        }
+    }
+
+    private void OpenDoor(bool isInitialLoad = false)
     {
         isOpen = true;
         openedDoorIDs.Add(GetDoorID());
+
+        if (!isInitialLoad)
+        {
+            StartCoroutine(PlayDoorOpenSFXWithDelay(0.3f));
+        }
 
         if (doorCollider != null) doorCollider.enabled = false;
         if (doorRenderer != null) doorRenderer.enabled = false;
@@ -82,6 +139,15 @@ public class CrossSceneDoor : MonoBehaviour
         if (disableGameObjectOnOpen)
         {
             gameObject.SetActive(false);
+        }
+    }
+
+    private System.Collections.IEnumerator PlayDoorOpenSFXWithDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("door_open");
         }
     }
 

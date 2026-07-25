@@ -54,6 +54,15 @@ public class KeyDoor : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Resets all opened key doors. Called when starting a new game from Main Menu.
+    /// </summary>
+    public static void ResetOpenedDoors()
+    {
+        openedDoorIDs.Clear();
+        Debug.Log("[KeyDoor] Reset all opened doors for a new game.");
+    }
+
     private string GetDoorID()
     {
         if (!string.IsNullOrEmpty(customDoorID)) return customDoorID;
@@ -96,6 +105,10 @@ public class KeyDoor : MonoBehaviour
             if (Time.time >= nextNotificationTime)
             {
                 nextNotificationTime = Time.time + 2.0f; // Cooldown to avoid notification spam
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySFX("fail_buzz");
+                }
                 if (!string.IsNullOrEmpty(missingKeyMessage))
                 {
                     NotificationUI.ShowNotification(missingKeyMessage);
@@ -152,9 +165,17 @@ public class KeyDoor : MonoBehaviour
 
     private void ApplyOpenState(bool isInitialLoad)
     {
-        if (!isInitialLoad && !string.IsNullOrEmpty(openSuccessMessage))
+        if (!isInitialLoad)
         {
-            NotificationUI.ShowNotification(openSuccessMessage);
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFX("door_open");
+            }
+
+            if (!string.IsNullOrEmpty(openSuccessMessage))
+            {
+                NotificationUI.ShowNotification(openSuccessMessage);
+            }
         }
 
         if (disableGameObjectOnOpen)

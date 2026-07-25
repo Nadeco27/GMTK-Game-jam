@@ -93,6 +93,20 @@ public class TutorialUI : MonoBehaviour
             nextButton.onClick.RemoveAllListeners();
             nextButton.onClick.AddListener(OnNextButtonClicked);
         }
+
+        AutoAttachButtonJuice();
+    }
+
+    private void AutoAttachButtonJuice()
+    {
+        Button[] buttons = GetComponentsInChildren<Button>(true);
+        foreach (Button btn in buttons)
+        {
+            if (btn != null && btn.GetComponent<UIButtonJuice>() == null)
+            {
+                btn.gameObject.AddComponent<UIButtonJuice>();
+            }
+        }
     }
 
     private void Start()
@@ -164,6 +178,11 @@ public class TutorialUI : MonoBehaviour
     /// </summary>
     public void OnNextButtonClicked()
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("button_click");
+        }
+
         AnimateButtonPunch(nextButton);
 
         if (currentPageIndex < pages.Count - 1)
@@ -182,6 +201,11 @@ public class TutorialUI : MonoBehaviour
     /// </summary>
     public void OnPreviousButtonClicked()
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("button_click");
+        }
+
         AnimateButtonPunch(previousButton);
 
         if (currentPageIndex > 0)
@@ -196,6 +220,10 @@ public class TutorialUI : MonoBehaviour
     /// </summary>
     public void CloseTutorial()
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("button_click");
+        }
         if (tutorialPanel != null && useDOTween)
         {
             activePanelTween?.Kill();

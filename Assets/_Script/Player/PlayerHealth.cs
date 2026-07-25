@@ -27,6 +27,10 @@ public class PlayerHealth : MonoBehaviour
     // [Tooltip("Reference to the Hotbar component on the player.")]
     // [SerializeField] private Hotbar hotbar;
 
+    [Header("Death Animation Settings")]
+    [Tooltip("Delay in seconds to let the death animation finish playing before fading out.")]
+    [SerializeField] private float deathAnimationDelay = 1.2f;
+
     public float CurrentHealth { get; private set; }
     public float MaxHealth => maxHealth;
     public bool IsDead { get; private set; }
@@ -47,6 +51,7 @@ public class PlayerHealth : MonoBehaviour
 
     private Vector2 lastPosition;
     private Rigidbody2D rb;
+    private Animator anim;
 
     private void Awake()
     {
@@ -58,6 +63,7 @@ public class PlayerHealth : MonoBehaviour
 
         Instance = this;
         rb = GetComponent<Rigidbody2D>();
+        anim = GetComponentInChildren<Animator>();
         CurrentHealth = maxHealth;
 
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -138,13 +144,34 @@ public class PlayerHealth : MonoBehaviour
     }
 
     /// <summary>
-    /// Refills player health to full capacity.
+    /// Refills player health to full capacity and resets animator & controls state.
     /// </summary>
     public void ResetHealth()
     {
         CurrentHealth = maxHealth;
         IsDead = false;
         ResetLastPosition();
+
+        if (anim != null)
+        {
+            anim.SetBool("IsDead", false);
+            anim.SetFloat("Speed", 0f);
+            if (anim.HasState(0, Animator.StringToHash("Idle")))
+            {
+                anim.Play("Idle", 0, 0f);
+            }
+        }
+
+        if (PlayerController.Instance != null)
+        {
+            PlayerController.Instance.enabled = true;
+        }
+
+        if (PlayerInteractor.Instance != null)
+        {
+            PlayerInteractor.Instance.SetInteractionEnabled(true);
+        }
+
         OnHealthChanged?.Invoke(CurrentHealth, maxHealth);
     }
 
@@ -153,12 +180,16 @@ public class PlayerHealth : MonoBehaviour
         if (IsDead) return;
 
         IsDead = true;
-        OnPlayerDied?.Invoke();
 
-        // Lock player controller and stop movement
+        // Lock player movement and stop velocity immediately
         if (PlayerController.Instance != null)
         {
             PlayerController.Instance.enabled = false;
+        }
+
+        if (PlayerInteractor.Instance != null)
+        {
+            PlayerInteractor.Instance.SetInteractionEnabled(false);
         }
 
         if (rb != null)
@@ -166,27 +197,44 @@ public class PlayerHealth : MonoBehaviour
             rb.linearVelocity = Vector2.zero;
         }
 
+        // Trigger Death Animation and zero out movement speed parameter
+        if (anim != null)
+        {
+            anim.SetFloat("Speed", 0f);
+            anim.SetBool("IsDead", true);
+        }
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("ink_dead");
+        }
+
+        OnPlayerDied?.Invoke();
+
         StartCoroutine(DeathAndRespawnRoutine());
     }
 
     private IEnumerator DeathAndRespawnRoutine()
     {
-        // Advance the run counter and purge trails older than 2 runs
+        // 1. Wait for death animation to finish playing completely before starting screen fade
+        yield return new WaitForSeconds(deathAnimationDelay);
+
+        // 2. Advance the run counter and purge trails older than 2 runs
         if (InkTrailManager.Instance != null)
         {
             InkTrailManager.Instance.AdvanceToNextRun();
         }
 
-        // Reset level connection so door spawn points are not triggered on respawn
+        // 3. Reset level connection so door spawn points are not triggered on respawn
         LevelConnection.ActiveConnection = null;
 
-        // Clear Inventory and Hotbar items on death
+        // 4. Clear Inventory and Hotbar items on death
         if (Inventory.Instance != null) Inventory.Instance.Clear();
         if (Hotbar.Instance != null) Hotbar.Instance.Clear();
 
         string targetScene = string.IsNullOrEmpty(initialBirthSceneName) ? fallbackSceneName : initialBirthSceneName;
 
-        // Fade screen out and load initial birth scene
+        // 5. Fade screen out and load initial birth scene
         if (SceneFader.Instance != null)
         {
             SceneFader.Instance.FadeToScene(targetScene, null);
@@ -202,22 +250,22 @@ public class PlayerHealth : MonoBehaviour
             }
         }
 
-        // Teleport player back to the exact initial birth position
+        // 6. Teleport player back to the exact initial birth position
         transform.position = initialBirthPosition;
 
-        // Clear TrailRenderer components to prevent purple teleport streaks across screen
+        // 7. Clear TrailRenderer components to prevent purple teleport streaks across screen
         TrailRenderer[] trailRenderers = GetComponentsInChildren<TrailRenderer>(true);
         foreach (TrailRenderer tr in trailRenderers)
         {
             tr.Clear();
         }
 
-        // Reset player state & position for new run
+        // 8. Reset player state & position for new run
         ResetHealth();
 
-        if (PlayerController.Instance != null)
+        if (AudioManager.Instance != null)
         {
-            PlayerController.Instance.enabled = true;
+            AudioManager.Instance.PlaySFX("ink_live");
         }
     }
 }

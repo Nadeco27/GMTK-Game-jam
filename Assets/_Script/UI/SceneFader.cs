@@ -54,6 +54,36 @@ public class SceneFader : MonoBehaviour
     }
 
     /// <summary>
+    /// Smoothly fades in from black screen.
+    /// </summary>
+    public void FadeIn(float duration = -1f)
+    {
+        if (duration < 0f) duration = fadeDuration;
+        StartCoroutine(FadeInRoutine(duration));
+    }
+
+    private IEnumerator FadeInRoutine(float duration)
+    {
+        IsTransitioning = true;
+        if (faderCanvasGroup == null) CreateDefaultFaderUI();
+
+        faderCanvasGroup.blocksRaycasts = true;
+        faderCanvasGroup.alpha = 1f;
+
+        float timer = 0f;
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            faderCanvasGroup.alpha = Mathf.Clamp01(1f - (timer / duration));
+            yield return null;
+        }
+
+        faderCanvasGroup.alpha = 0f;
+        faderCanvasGroup.blocksRaycasts = false;
+        IsTransitioning = false;
+    }
+
+    /// <summary>
     /// Smoothly transitions to a target scene using async loading & fade effect.
     /// </summary>
     public void FadeToScene(string sceneName, LevelConnection connection)

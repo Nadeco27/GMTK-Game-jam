@@ -10,13 +10,28 @@ public class LevelSpawnPoint : MonoBehaviour
     [Tooltip("The ScriptableObject representing this spawn point's connection.")]
     [SerializeField] private LevelConnection connection;
 
+    [Header("Default Spawn Point")]
+    [Tooltip("Check this if this is the default initial spawn point for a new game or when ActiveConnection is null.")]
+    [SerializeField] private bool isDefaultSpawnPoint = false;
+
     [Header("Player Identification")]
     [SerializeField] private string playerTag = "Player";
 
     private void Start()
     {
-        // Check if this spawn point matches the connection used during door scene transition
-        if (connection != null && connection == LevelConnection.ActiveConnection)
+        bool shouldSpawnHere = false;
+
+        if (LevelConnection.ActiveConnection != null)
+        {
+            shouldSpawnHere = (connection != null && connection == LevelConnection.ActiveConnection);
+        }
+        else
+        {
+            // If ActiveConnection is null (new game start), use default spawn point or first unassigned spawn point
+            shouldSpawnHere = isDefaultSpawnPoint || (connection == null);
+        }
+
+        if (shouldSpawnHere)
         {
             GameObject player = GameObject.FindWithTag(playerTag);
             if (player == null && PlayerController.Instance != null)
@@ -40,10 +55,6 @@ public class LevelSpawnPoint : MonoBehaviour
                 {
                     PlayerHealth.Instance.ResetLastPosition();
                 }
-            }
-            else
-            {
-                Debug.LogWarning($"[LevelSpawnPoint] Active connection matched, but GameObject with tag '{playerTag}' or PlayerController instance was not found in the scene.");
             }
         }
     }

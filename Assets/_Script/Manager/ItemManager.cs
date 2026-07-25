@@ -32,9 +32,9 @@ public class ItemManager : MonoBehaviour
     public bool IsCollected(string key) => collectedKeys.Contains(key);
     public void MarkCollected(string key) => collectedKeys.Add(key);
 
-    private void ClearAll()
+    public void ClearAll()
     {
         collectedKeys.Clear();
-        Debug.Log("[ItemPickupManager] Cleared collected items on player death.");
+        Debug.Log("[ItemManager] Cleared collected items on player death or new game.");
     }
 }

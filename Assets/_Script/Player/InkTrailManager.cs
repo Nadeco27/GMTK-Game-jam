@@ -26,6 +26,8 @@ public class InkTrailManager : MonoBehaviour
     [Tooltip("Number of runs ink trails will persist before being deleted.")]
     [SerializeField] private int maxRunRetentionCount = 2;
 
+    private int lastIntHealth;
+
     public int CurrentRunIndex => currentRunIndex;
 
     // Dictionary mapping scene name -> list of strokes in that scene
@@ -72,6 +74,18 @@ public class InkTrailManager : MonoBehaviour
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
         }
+    }
+
+    private void OnEnable()
+    {
+      
+        PlayerHealth.OnHealthChanged += HandleHealthChanged;
+    }
+
+    private void OnDisable()
+    {
+
+        PlayerHealth.OnHealthChanged -= HandleHealthChanged;
     }
 
     private bool IsNonGameplayScene(string sceneName)
@@ -179,6 +193,34 @@ public class InkTrailManager : MonoBehaviour
         float randomScale = UnityEngine.Random.Range(0.1f, 0.2f);
         dot.transform.localScale = new Vector3(randomScale, randomScale, 1f);
     }
+    private void HandleHealthChanged(float currentHealth, float maxHealth)
+    {
+        // 1. Reset angka pelacak jika darah penuh (saat awal main atau respawn)
+        if (currentHealth >= maxHealth || lastIntHealth == 0)
+        {
+            lastIntHealth = Mathf.CeilToInt(maxHealth);
+            return;
+        }
+
+        // 2. Cek apakah angka bulatnya turun
+        int currentIntHealth = Mathf.CeilToInt(currentHealth);
+
+        if (currentIntHealth < lastIntHealth)
+        {
+            int dropsToSpawn = lastIntHealth - currentIntHealth;
+            for (int i = 0; i < dropsToSpawn; i++)
+            {
+                // 3. Ambil posisi player langsung dari PlayerController dan jatuhkan tinta
+                if (PlayerController.Instance != null)
+                {
+                    Vector2 playerPos = PlayerController.Instance.transform.position;
+                    AddPointToCurrentStroke(playerPos);
+                }
+            }
+            // 4. Update angka memori
+            lastIntHealth = currentIntHealth; 
+        }
+    }
     /// <summary>
     /// Checks if there is any ink stroke point within a specified radius of the target position in the given scene.
     /// </summary>
@@ -257,6 +299,21 @@ public class InkTrailManager : MonoBehaviour
         }
 
         RebuildSceneStrokes(currentScene);
+    }
+
+    /// <summary>
+    /// Resets all ink trails across all scenes and resets run index to 1. Called when starting a new game.
+    /// </summary>
+    public void ResetAllInk()
+    {
+        sceneStrokes.Clear();
+        currentStroke = null;
+        currentRunIndex = 1;
+        if (inkContainer != null)
+        {
+            Destroy(inkContainer);
+        }
+        Debug.Log("[InkTrailManager] Cleared all ink trails for new game.");
     }
     #endregion
 }

@@ -18,6 +18,13 @@ public class ItemInfo : MonoBehaviour, IInteractable
     [Tooltip("Custom prompt message displayed when in interaction range.")]
     [SerializeField] private string promptMessage = "Tekan E untuk membaca";
 
+    [Header("Notification Settings")]
+    [Tooltip("If true, shows a notification UI message after closing the Info Panel.")]
+    [SerializeField] private bool showNotificationOnClose = true;
+
+    [Tooltip("The text to display in the notification UI after closing the Info Panel.")]
+    [SerializeField] private string notificationMessage = "Something has changed within the map.";
+
     [Header("Shortcut Unlock Settings (Same Scene)")]
     [Tooltip("If true, interacting with this info item will permanently open/unlock hidden shortcuts in this run.")]
     [SerializeField] private bool unlockShortcutOnInteract = false;
@@ -87,9 +94,15 @@ public class ItemInfo : MonoBehaviour, IInteractable
 
     public void Interact(GameObject interactor)
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("paper_pickup");
+        }
+
         if (InfoPanelUI.Instance != null)
         {
-            InfoPanelUI.Instance.ShowInfo(infoSprite);
+            string notificationText = showNotificationOnClose ? notificationMessage : null;
+            InfoPanelUI.Instance.ShowInfo(infoSprite, notificationText);
         }
         else
         {
