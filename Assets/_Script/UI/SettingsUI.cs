@@ -77,6 +77,12 @@ public class SettingsUI : MonoBehaviour
             AudioManager.Instance.PlaySFX("button_click");
         }
 
+        if (PauseUI.Instance != null && PauseUI.Instance.IsPaused)
+        {
+            PauseUI.Instance.CloseSettingsAndReturnToPause();
+            return;
+        }
+
         if (SettingsPanel != null)
         {
             SettingsPanel.SetActive(false);

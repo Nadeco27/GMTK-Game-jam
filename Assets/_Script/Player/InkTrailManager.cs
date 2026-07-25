@@ -258,5 +258,20 @@ public class InkTrailManager : MonoBehaviour
 
         RebuildSceneStrokes(currentScene);
     }
+
+    /// <summary>
+    /// Resets all ink trails across all scenes and resets run index to 1. Called when starting a new game.
+    /// </summary>
+    public void ResetAllInk()
+    {
+        sceneStrokes.Clear();
+        currentStroke = null;
+        currentRunIndex = 1;
+        if (inkContainer != null)
+        {
+            Destroy(inkContainer);
+        }
+        Debug.Log("[InkTrailManager] Cleared all ink trails for new game.");
+    }
     #endregion
 }

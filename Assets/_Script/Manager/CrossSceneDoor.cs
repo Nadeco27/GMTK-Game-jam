@@ -53,6 +53,15 @@ public class CrossSceneDoor : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Resets all opened cross-scene doors. Called when starting a new game from Main Menu.
+    /// </summary>
+    public static void ResetOpenedDoors()
+    {
+        openedDoorIDs.Clear();
+        Debug.Log("[CrossSceneDoor] Reset all opened cross-scene doors for a new game.");
+    }
+
     private void Update()
     {
         if (isOpen) return; // If already unlocked persistently, stay open

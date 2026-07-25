@@ -54,6 +54,15 @@ public class KeyDoor : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Resets all opened key doors. Called when starting a new game from Main Menu.
+    /// </summary>
+    public static void ResetOpenedDoors()
+    {
+        openedDoorIDs.Clear();
+        Debug.Log("[KeyDoor] Reset all opened doors for a new game.");
+    }
+
     private string GetDoorID()
     {
         if (!string.IsNullOrEmpty(customDoorID)) return customDoorID;

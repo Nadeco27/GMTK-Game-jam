@@ -140,7 +140,7 @@ public class MainMenuInteractable : MonoBehaviour
     }
 
     /// <summary>
-    /// Play Scene button clicked listener.
+    /// Play Scene button clicked listener. Resets game progress to start a fresh run.
     /// </summary>
     public void PlayScene()
     {
@@ -154,6 +154,9 @@ public class MainMenuInteractable : MonoBehaviour
             AudioManager.Instance.PlaySFX("button_click");
         }
 
+        // Reset all game progress for a fresh game start
+        ResetGameProgress();
+
         if (SceneFader.Instance != null)
         {
             if (SceneFader.Instance.IsTransitioning) return;
@@ -163,6 +166,32 @@ public class MainMenuInteractable : MonoBehaviour
         {
             SceneManager.LoadScene(targetSceneName);
         }
+    }
+
+    /// <summary>
+    /// Resets all persistent game data (active spawn point, player health, doors, shortcuts, inventory, ink trails).
+    /// </summary>
+    public static void ResetGameProgress()
+    {
+        LevelConnection.ActiveConnection = null;
+
+        if (PlayerHealth.Instance != null) PlayerHealth.Instance.ResetHealth();
+        if (ShortcutManager.Instance != null) ShortcutManager.Instance.ResetAllShortcuts();
+        if (InkTrailManager.Instance != null) InkTrailManager.Instance.ResetAllInk();
+        if (Inventory.Instance != null) Inventory.Instance.Clear();
+        if (ItemManager.Instance != null) ItemManager.Instance.ClearAll();
+
+        KeyDoor.ResetOpenedDoors();
+        CrossSceneDoor.ResetOpenedDoors();
+
+        // Destroy persistent player instance so a fresh player spawns at Map 1 initial spawn point
+        if (PlayerController.Instance != null)
+        {
+            PlayerController.Instance.ClearTrailRenderers();
+            Destroy(PlayerController.Instance.gameObject);
+        }
+
+        Debug.Log("[GameReset] Full game progress (player spawn position, health 100%, doors, shortcuts, inventory, ink trails) reset for a NEW GAME.");
     }
 
     /// <summary>

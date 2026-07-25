@@ -128,16 +128,47 @@ public class AudioManager : MonoBehaviour
         SetSFXVolume(GetSFXVolume());
     }
 
+    private bool isApplicationFocused = true;
+
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        isApplicationFocused = hasFocus;
+
+        if (hasFocus)
+        {
+            // When regaining focus, resume current music track if it was paused by OS focus change
+            AudioSource activeSource = isSourceAPlaying ? musicSourceA : musicSourceB;
+            if (activeSource != null && activeSource.clip != null && !activeSource.isPlaying)
+            {
+                // Resume song if it did not naturally reach the end of the track
+                if (activeSource.time < (activeSource.clip.length - 0.5f))
+                {
+                    activeSource.UnPause();
+                    if (!activeSource.isPlaying)
+                    {
+                        activeSource.Play();
+                    }
+                    Debug.Log($"[AudioManager] Regained focus. Resuming music track '{currentMusicID}' without skipping.");
+                }
+            }
+        }
+    }
+
     private void Update()
     {
-        // Monitor active music playback and auto-advance to next random track if non-looping track ends
-        if (autoPlayNextMusicWhenEnded && !string.IsNullOrEmpty(currentMusicID) && activeCrossfadeRoutine == null)
+        // Monitor active music playback and auto-advance to next random track ONLY if non-looping track naturally ends
+        if (autoPlayNextMusicWhenEnded && !string.IsNullOrEmpty(currentMusicID) && activeCrossfadeRoutine == null && isApplicationFocused)
         {
             AudioSource activeSource = isSourceAPlaying ? musicSourceA : musicSourceB;
-            if (activeSource != null && !activeSource.isPlaying)
+            if (activeSource != null && activeSource.clip != null && !activeSource.loop)
             {
-                Debug.Log("[AudioManager] Current music finished. Auto-playing next random track.");
-                PlayRandomMusic(defaultCrossfadeDuration);
+                // Only consider track finished if playback position has reached the end of the clip
+                bool isTrackFinished = !activeSource.isPlaying && activeSource.time >= (activeSource.clip.length - 0.3f);
+                if (isTrackFinished)
+                {
+                    Debug.Log("[AudioManager] Current music finished naturally. Auto-playing next random track.");
+                    PlayRandomMusic(defaultCrossfadeDuration);
+                }
             }
         }
     }
