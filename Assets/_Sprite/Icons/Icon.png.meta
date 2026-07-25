@@ -129,10 +129,10 @@ TextureImporter:
       name: Icon_0
       rect:
         serializedVersion: 2
-        x: 26
-        y: 172
-        width: 691
-        height: 393
+        x: 7
+        y: 153
+        width: 729
+        height: 431
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

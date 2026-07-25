@@ -62,7 +62,6 @@ public class UIButtonJuice : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     {
         hoverTween?.Kill();
         clickTween?.Kill();
-        transform.DOKill();
     }
 
     public void OnPointerEnter(PointerEventData eventData)

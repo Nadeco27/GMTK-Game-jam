@@ -41,6 +41,9 @@ public class PauseUI : MonoBehaviour
     [Tooltip("Title Text component (e.g. 'PAUSED').")]
     [SerializeField] private Transform pauseTitleTransform;
 
+    [Tooltip("Optional panel content container box for pop animation (auto-detected if unassigned).")]
+    [SerializeField] private Transform pauseContentContainer;
+
     [Header("Button References")]
     [SerializeField] private Button resumeButton;
     [SerializeField] private Button settingsButton;
@@ -82,6 +85,30 @@ public class PauseUI : MonoBehaviour
     private Tween activeEntranceTween;
     private bool isTransitioning = false;
     private float targetOverlayAlpha = -1f;
+    private Coroutine transitionTimeoutCoroutine;
+
+    private void SetTransitioning(bool state, float timeout = 0.5f)
+    {
+        isTransitioning = state;
+
+        if (transitionTimeoutCoroutine != null)
+        {
+            StopCoroutine(transitionTimeoutCoroutine);
+            transitionTimeoutCoroutine = null;
+        }
+
+        if (state && gameObject.activeInHierarchy)
+        {
+            transitionTimeoutCoroutine = StartCoroutine(TransitionTimeoutRoutine(timeout));
+        }
+    }
+
+    private IEnumerator TransitionTimeoutRoutine(float timeout)
+    {
+        yield return new WaitForSecondsRealtime(timeout);
+        isTransitioning = false;
+        transitionTimeoutCoroutine = null;
+    }
 
     private void CacheDarkBackgroundAlpha()
     {
@@ -103,7 +130,7 @@ public class PauseUI : MonoBehaviour
         }
 
         _instance = this;
-        isTransitioning = false;
+        SetTransitioning(false);
         if (transform.parent == null)
         {
             DontDestroyOnLoad(gameObject);
@@ -144,11 +171,12 @@ public class PauseUI : MonoBehaviour
     public void CopyReferencesFrom(PauseUI source)
     {
         if (source == null) return;
-        isTransitioning = false;
+        SetTransitioning(false);
 
         this.pausePanel = source.pausePanel;
         this.darkBackgroundOverlay = source.darkBackgroundOverlay;
         this.pauseTitleTransform = source.pauseTitleTransform;
+        this.pauseContentContainer = source.pauseContentContainer;
         this.resumeButton = source.resumeButton;
         this.settingsButton = source.settingsButton;
         this.mainMenuButton = source.mainMenuButton;
@@ -187,7 +215,7 @@ public class PauseUI : MonoBehaviour
 
     private void OnDestroy()
     {
-        isTransitioning = false;
+        SetTransitioning(false);
         activeEntranceTween?.Kill();
         if (pausePanel != null) pausePanel.transform.DOKill();
     }
@@ -205,6 +233,14 @@ public class PauseUI : MonoBehaviour
         if (darkBackgroundOverlay == null && pausePanel != null)
         {
             darkBackgroundOverlay = pausePanel.GetComponentInChildren<Image>(true);
+        }
+
+        if (pauseContentContainer == null && pauseTitleTransform != null && pauseTitleTransform.parent != null)
+        {
+            if (darkBackgroundOverlay == null || pauseTitleTransform.parent != darkBackgroundOverlay.transform)
+            {
+                pauseContentContainer = pauseTitleTransform.parent;
+            }
         }
 
         AutoAttachButtonJuice();
@@ -361,7 +397,7 @@ public class PauseUI : MonoBehaviour
         RebindReferencesIfMissing();
 
         IsPaused = true;
-        isTransitioning = true;
+        SetTransitioning(true, popAnimDuration + 0.35f);
         Time.timeScale = 0f;
 
         // Lock player controller movement and velocity
@@ -406,26 +442,34 @@ public class PauseUI : MonoBehaviour
             {
                 activeEntranceTween?.Kill();
 
-                // 2. Staggered Pop-In for Title and Buttons
-                if (pauseTitleTransform != null)
+                // 2. Pop-In for Main Pause Panel Content Container Box
+                if (pauseContentContainer != null && pauseContentContainer != pausePanel.transform && (darkBackgroundOverlay == null || pauseContentContainer != darkBackgroundOverlay.transform))
+                {
+                    pauseContentContainer.DOKill();
+                    pauseContentContainer.localScale = Vector3.zero;
+                    pauseContentContainer.DOScale(Vector3.one, 0.35f).SetEase(Ease.OutBack).SetUpdate(true);
+                }
+
+                // 3. Staggered Pop-In for Title and Buttons
+                if (pauseTitleTransform != null && pauseTitleTransform != pauseContentContainer)
                 {
                     pauseTitleTransform.DOKill();
                     pauseTitleTransform.localScale = Vector3.zero;
-                    pauseTitleTransform.DOScale(Vector3.one, 0.35f).SetEase(Ease.OutBack).SetDelay(0.1f).SetUpdate(true);
+                    pauseTitleTransform.DOScale(Vector3.one, 0.35f).SetEase(Ease.OutBack).SetDelay(0.08f).SetUpdate(true);
                 }
 
                 if (resumeButton != null)
                 {
                     resumeButton.transform.DOKill();
                     resumeButton.transform.localScale = Vector3.zero;
-                    resumeButton.transform.DOScale(Vector3.one, 0.35f).SetEase(Ease.OutBack).SetDelay(0.15f).SetUpdate(true);
+                    resumeButton.transform.DOScale(Vector3.one, 0.35f).SetEase(Ease.OutBack).SetDelay(0.12f).SetUpdate(true);
                 }
 
                 if (settingsButton != null)
                 {
                     settingsButton.transform.DOKill();
                     settingsButton.transform.localScale = Vector3.zero;
-                    settingsButton.transform.DOScale(Vector3.one, 0.35f).SetEase(Ease.OutBack).SetDelay(0.25f).SetUpdate(true);
+                    settingsButton.transform.DOScale(Vector3.one, 0.35f).SetEase(Ease.OutBack).SetDelay(0.20f).SetUpdate(true);
                 }
 
                 if (mainMenuButton != null)
@@ -434,20 +478,15 @@ public class PauseUI : MonoBehaviour
                     mainMenuButton.transform.localScale = Vector3.zero;
                     activeEntranceTween = mainMenuButton.transform.DOScale(Vector3.one, 0.35f)
                         .SetEase(Ease.OutBack)
-                        .SetDelay(0.35f)
-                        .SetUpdate(true)
-                        .OnComplete(() =>
-                        {
-                            isTransitioning = false;
-                        });
+                        .SetDelay(0.28f)
+                        .SetUpdate(true);
                 }
-                else
-                {
-                    DOVirtual.DelayedCall(popAnimDuration, () => isTransitioning = false).SetUpdate(true);
-                }
+
+                DOVirtual.DelayedCall(0.65f, () => SetTransitioning(false)).SetUpdate(true);
             }
             else
             {
+                if (pauseContentContainer != null) pauseContentContainer.localScale = Vector3.one;
                 if (pauseTitleTransform != null) pauseTitleTransform.localScale = Vector3.one;
                 if (resumeButton != null) resumeButton.transform.localScale = Vector3.one;
                 if (settingsButton != null) settingsButton.transform.localScale = Vector3.one;
@@ -458,12 +497,12 @@ public class PauseUI : MonoBehaviour
                     c.a = targetOverlayAlpha;
                     darkBackgroundOverlay.color = c;
                 }
-                isTransitioning = false;
+                SetTransitioning(false);
             }
         }
         else
         {
-            isTransitioning = false;
+            SetTransitioning(false);
         }
     }
 
@@ -475,7 +514,7 @@ public class PauseUI : MonoBehaviour
     {
         if (!IsPaused || isTransitioning) return;
 
-        isTransitioning = true;
+        SetTransitioning(true, 0.35f);
 
         if (AudioManager.Instance != null)
         {
@@ -498,15 +537,23 @@ public class PauseUI : MonoBehaviour
         {
             activeEntranceTween?.Kill();
 
-            // 1. Dark background overlay: pure fade-out
+            // 1. Dark background overlay: pure fade-out (alpha 0, scale stays Vector3.one)
             if (darkBackgroundOverlay != null)
             {
                 darkBackgroundOverlay.DOKill();
+                darkBackgroundOverlay.transform.localScale = Vector3.one;
                 darkBackgroundOverlay.DOFade(0f, 0.22f).SetUpdate(true);
             }
 
-            // 2. Scale down UI elements
-            if (pauseTitleTransform != null)
+            // 2. Scale down pause panel content container box
+            if (pauseContentContainer != null && pauseContentContainer != pausePanel.transform && (darkBackgroundOverlay == null || pauseContentContainer != darkBackgroundOverlay.transform))
+            {
+                pauseContentContainer.DOKill();
+                pauseContentContainer.DOScale(Vector3.zero, 0.22f).SetEase(Ease.InBack).SetUpdate(true);
+            }
+
+            // 3. Scale down UI title and buttons
+            if (pauseTitleTransform != null && pauseTitleTransform != pauseContentContainer)
             {
                 pauseTitleTransform.DOKill();
                 pauseTitleTransform.DOScale(Vector3.zero, 0.22f).SetEase(Ease.InBack).SetUpdate(true);
@@ -524,21 +571,13 @@ public class PauseUI : MonoBehaviour
                 settingsButton.transform.DOScale(Vector3.zero, 0.22f).SetEase(Ease.InBack).SetUpdate(true);
             }
 
-            Tween exitTween = null;
             if (mainMenuButton != null)
             {
                 mainMenuButton.transform.DOKill();
-                exitTween = mainMenuButton.transform.DOScale(Vector3.zero, 0.22f).SetEase(Ease.InBack).SetUpdate(true);
+                mainMenuButton.transform.DOScale(Vector3.zero, 0.22f).SetEase(Ease.InBack).SetUpdate(true);
             }
 
-            if (exitTween != null)
-            {
-                exitTween.OnComplete(() => FinishResumeGame());
-            }
-            else
-            {
-                DOVirtual.DelayedCall(0.22f, () => FinishResumeGame()).SetUpdate(true);
-            }
+            DOVirtual.DelayedCall(0.24f, () => FinishResumeGame()).SetUpdate(true);
         }
         else
         {
@@ -554,13 +593,14 @@ public class PauseUI : MonoBehaviour
             pausePanel.transform.localScale = Vector3.one;
         }
 
+        if (pauseContentContainer != null) pauseContentContainer.localScale = Vector3.one;
         if (pauseTitleTransform != null) pauseTitleTransform.localScale = Vector3.one;
         if (resumeButton != null) resumeButton.transform.localScale = Vector3.one;
         if (settingsButton != null) settingsButton.transform.localScale = Vector3.one;
         if (mainMenuButton != null) mainMenuButton.transform.localScale = Vector3.one;
 
         UnfreezeAndUnlockPlayer();
-        isTransitioning = false;
+        SetTransitioning(false);
     }
 
     private void UnfreezeAndUnlockPlayer()
@@ -615,14 +655,14 @@ public class PauseUI : MonoBehaviour
                 settingsUI.EnsurePanelActive();
             }
 
-            isTransitioning = true;
+            SetTransitioning(true, 0.45f);
             settingsPanel.transform.DOKill();
             settingsPanel.SetActive(true);
             settingsPanel.transform.localScale = Vector3.zero;
             settingsPanel.transform.DOScale(Vector3.one, 0.35f)
                 .SetEase(Ease.OutBack)
-                .SetUpdate(true)
-                .OnComplete(() => isTransitioning = false);
+                .SetUpdate(true);
+            DOVirtual.DelayedCall(0.36f, () => SetTransitioning(false)).SetUpdate(true);
         }
         else
         {
@@ -650,21 +690,21 @@ public class PauseUI : MonoBehaviour
 
         if (settingsPanel != null)
         {
-            isTransitioning = true;
+            SetTransitioning(true, 0.3f);
             settingsPanel.transform.DOKill();
             settingsPanel.transform.DOScale(Vector3.zero, 0.2f)
                 .SetEase(Ease.InBack)
-                .SetUpdate(true)
-                .OnComplete(() =>
-                {
-                    settingsPanel.SetActive(false);
-                    settingsPanel.transform.localScale = Vector3.one;
-                    isTransitioning = false;
-                });
+                .SetUpdate(true);
+            DOVirtual.DelayedCall(0.21f, () =>
+            {
+                settingsPanel.SetActive(false);
+                settingsPanel.transform.localScale = Vector3.one;
+                SetTransitioning(false);
+            }).SetUpdate(true);
         }
         else
         {
-            isTransitioning = false;
+            SetTransitioning(false);
         }
     }
 
@@ -682,14 +722,14 @@ public class PauseUI : MonoBehaviour
 
         if (confirmMainMenuPanel != null)
         {
-            isTransitioning = true;
+            SetTransitioning(true, 0.45f);
             confirmMainMenuPanel.transform.DOKill();
             confirmMainMenuPanel.SetActive(true);
             confirmMainMenuPanel.transform.localScale = Vector3.zero;
             confirmMainMenuPanel.transform.DOScale(Vector3.one, 0.35f)
                 .SetEase(Ease.OutBack)
-                .SetUpdate(true)
-                .OnComplete(() => isTransitioning = false);
+                .SetUpdate(true);
+            DOVirtual.DelayedCall(0.36f, () => SetTransitioning(false)).SetUpdate(true);
         }
         else
         {
@@ -727,21 +767,21 @@ public class PauseUI : MonoBehaviour
 
         if (confirmMainMenuPanel != null)
         {
-            isTransitioning = true;
+            SetTransitioning(true, 0.3f);
             confirmMainMenuPanel.transform.DOKill();
             confirmMainMenuPanel.transform.DOScale(Vector3.zero, 0.2f)
                 .SetEase(Ease.InBack)
-                .SetUpdate(true)
-                .OnComplete(() =>
-                {
-                    confirmMainMenuPanel.SetActive(false);
-                    confirmMainMenuPanel.transform.localScale = Vector3.one;
-                    isTransitioning = false;
-                });
+                .SetUpdate(true);
+            DOVirtual.DelayedCall(0.21f, () =>
+            {
+                confirmMainMenuPanel.SetActive(false);
+                confirmMainMenuPanel.transform.localScale = Vector3.one;
+                SetTransitioning(false);
+            }).SetUpdate(true);
         }
         else
         {
-            isTransitioning = false;
+            SetTransitioning(false);
         }
     }
 
@@ -750,7 +790,7 @@ public class PauseUI : MonoBehaviour
     /// </summary>
     public void ReturnToMainMenuFromPause()
     {
-        isTransitioning = false;
+        SetTransitioning(false);
         UnfreezeAndUnlockPlayer();
 
         if (confirmMainMenuPanel != null)
