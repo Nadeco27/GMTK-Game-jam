@@ -105,6 +105,10 @@ public class KeyDoor : MonoBehaviour
             if (Time.time >= nextNotificationTime)
             {
                 nextNotificationTime = Time.time + 2.0f; // Cooldown to avoid notification spam
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySFX("fail_buzz");
+                }
                 if (!string.IsNullOrEmpty(missingKeyMessage))
                 {
                     NotificationUI.ShowNotification(missingKeyMessage);

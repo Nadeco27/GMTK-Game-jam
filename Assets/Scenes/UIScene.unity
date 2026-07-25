@@ -3021,6 +3021,14 @@ MonoBehaviour:
     pitchRandomRange: 0.1
     basePitch: 1
     loop: 0
+  - soundID: fail_buzz
+    audioFile: {fileID: 8300000, guid: 7dc1ca7e4295c5e45ac75a3292bb90bb, type: 3}
+    soundType: 1
+    volume: 0.75
+    useRandomPitch: 0
+    pitchRandomRange: 0.1
+    basePitch: 1
+    loop: 0
   defaultCrossfadeDuration: 1.2
   autoPlayMusicOnStart: 1
   playRandomMusicOnStart: 1

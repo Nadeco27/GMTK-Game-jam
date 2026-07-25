@@ -268,6 +268,7 @@ GameObject:
   - component: {fileID: 116574673}
   - component: {fileID: 116574675}
   - component: {fileID: 116574674}
+  - component: {fileID: 116574676}
   m_Layer: 5
   m_Name: Pencil (3)
   m_TagString: Untagged
@@ -308,7 +309,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -332,6 +333,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 116574672}
   m_CullTransparentMesh: 1
+--- !u!114 &116574676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 116574672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 055e8667b541a2c40a4c017e5d64ef9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuPropHover
+  rotationAngle: 15
+  rotateDuration: 0.35
+  returnDuration: 0.45
+  enterEase: 6
+  returnEase: 6
 --- !u!1 &152273215
 GameObject:
   m_ObjectHideFlags: 0
@@ -343,6 +361,7 @@ GameObject:
   - component: {fileID: 152273216}
   - component: {fileID: 152273218}
   - component: {fileID: 152273217}
+  - component: {fileID: 152273219}
   m_Layer: 5
   m_Name: Pencil (2)
   m_TagString: Untagged
@@ -383,7 +402,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -407,6 +426,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 152273215}
   m_CullTransparentMesh: 1
+--- !u!114 &152273219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 152273215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 055e8667b541a2c40a4c017e5d64ef9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuPropHover
+  rotationAngle: 15
+  rotateDuration: 0.35
+  returnDuration: 0.45
+  enterEase: 6
+  returnEase: 6
 --- !u!224 &280200357 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 896079799557955926, guid: d008507271548b043b7a008f4fa0b4cc, type: 3}
@@ -423,6 +459,7 @@ GameObject:
   - component: {fileID: 541722178}
   - component: {fileID: 541722180}
   - component: {fileID: 541722179}
+  - component: {fileID: 541722181}
   m_Layer: 5
   m_Name: Paint Green (1)
   m_TagString: Untagged
@@ -447,7 +484,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -899, y: -469}
-  m_SizeDelta: {x: 400, y: 400}
+  m_SizeDelta: {x: 400, y: 211.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &541722179
 MonoBehaviour:
@@ -463,7 +500,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -487,6 +524,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 541722177}
   m_CullTransparentMesh: 1
+--- !u!114 &541722181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 541722177}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 055e8667b541a2c40a4c017e5d64ef9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuPropHover
+  rotationAngle: 15
+  rotateDuration: 0.35
+  returnDuration: 0.45
+  enterEase: 6
+  returnEase: 6
 --- !u!224 &547481723 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8803857028961476206, guid: d008507271548b043b7a008f4fa0b4cc, type: 3}
@@ -503,6 +557,7 @@ GameObject:
   - component: {fileID: 672650827}
   - component: {fileID: 672650829}
   - component: {fileID: 672650828}
+  - component: {fileID: 672650830}
   m_Layer: 5
   m_Name: Eraser
   m_TagString: Untagged
@@ -527,7 +582,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -912, y: -38}
-  m_SizeDelta: {x: 300, y: 400}
+  m_SizeDelta: {x: 300, y: 223}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &672650828
 MonoBehaviour:
@@ -543,7 +598,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -567,6 +622,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 672650826}
   m_CullTransparentMesh: 1
+--- !u!114 &672650830
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 672650826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 055e8667b541a2c40a4c017e5d64ef9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuPropHover
+  rotationAngle: 15
+  rotateDuration: 0.35
+  returnDuration: 0.45
+  enterEase: 6
+  returnEase: 6
 --- !u!1 &675747147
 GameObject:
   m_ObjectHideFlags: 0
@@ -734,6 +806,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1343763748}
   - {fileID: 1663613677}
   - {fileID: 1353561800}
   - {fileID: 1686473702}
@@ -909,6 +982,7 @@ GameObject:
   - component: {fileID: 771075407}
   - component: {fileID: 771075409}
   - component: {fileID: 771075408}
+  - component: {fileID: 771075410}
   m_Layer: 5
   m_Name: Paint yellow
   m_TagString: Untagged
@@ -933,7 +1007,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -241, y: 495}
-  m_SizeDelta: {x: 400, y: 400}
+  m_SizeDelta: {x: 400, y: 200.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &771075408
 MonoBehaviour:
@@ -949,7 +1023,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -973,6 +1047,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 771075406}
   m_CullTransparentMesh: 1
+--- !u!114 &771075410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 771075406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 055e8667b541a2c40a4c017e5d64ef9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuPropHover
+  rotationAngle: 15
+  rotateDuration: 0.35
+  returnDuration: 0.45
+  enterEase: 6
+  returnEase: 6
 --- !u!1 &774978758
 GameObject:
   m_ObjectHideFlags: 0
@@ -984,6 +1075,7 @@ GameObject:
   - component: {fileID: 774978759}
   - component: {fileID: 774978761}
   - component: {fileID: 774978760}
+  - component: {fileID: 774978762}
   m_Layer: 5
   m_Name: Paint Green
   m_TagString: Untagged
@@ -1008,7 +1100,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 386, y: -507}
-  m_SizeDelta: {x: 400, y: 400}
+  m_SizeDelta: {x: 400, y: 218.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &774978760
 MonoBehaviour:
@@ -1024,7 +1116,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1048,6 +1140,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 774978758}
   m_CullTransparentMesh: 1
+--- !u!114 &774978762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 774978758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 055e8667b541a2c40a4c017e5d64ef9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuPropHover
+  rotationAngle: 15
+  rotateDuration: 0.35
+  returnDuration: 0.45
+  enterEase: 6
+  returnEase: 6
 --- !u!1 &976527358
 GameObject:
   m_ObjectHideFlags: 0
@@ -1059,6 +1168,7 @@ GameObject:
   - component: {fileID: 976527359}
   - component: {fileID: 976527361}
   - component: {fileID: 976527360}
+  - component: {fileID: 976527362}
   m_Layer: 5
   m_Name: Pencil (4)
   m_TagString: Untagged
@@ -1099,7 +1209,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1123,6 +1233,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 976527358}
   m_CullTransparentMesh: 1
+--- !u!114 &976527362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 976527358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 055e8667b541a2c40a4c017e5d64ef9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuPropHover
+  rotationAngle: 15
+  rotateDuration: 0.35
+  returnDuration: 0.45
+  enterEase: 6
+  returnEase: 6
 --- !u!1 &981926954
 GameObject:
   m_ObjectHideFlags: 0
@@ -1134,6 +1261,7 @@ GameObject:
   - component: {fileID: 981926955}
   - component: {fileID: 981926957}
   - component: {fileID: 981926956}
+  - component: {fileID: 981926958}
   m_Layer: 5
   m_Name: Glue
   m_TagString: Untagged
@@ -1158,7 +1286,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -802, y: 447}
-  m_SizeDelta: {x: 550, y: 600}
+  m_SizeDelta: {x: 550, y: 251.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &981926956
 MonoBehaviour:
@@ -1174,7 +1302,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1198,6 +1326,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 981926954}
   m_CullTransparentMesh: 1
+--- !u!114 &981926958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 981926954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 055e8667b541a2c40a4c017e5d64ef9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuPropHover
+  rotationAngle: 15
+  rotateDuration: 0.35
+  returnDuration: 0.45
+  enterEase: 6
+  returnEase: 6
 --- !u!224 &1057278183 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2232551485657055189, guid: d008507271548b043b7a008f4fa0b4cc, type: 3}
@@ -1328,6 +1473,14 @@ MonoBehaviour:
     audioFile: {fileID: 8300000, guid: 14b22615cfafd4847bc27474e62bac13, type: 3}
     soundType: 1
     volume: 0.5
+    useRandomPitch: 0
+    pitchRandomRange: 0.1
+    basePitch: 1
+    loop: 0
+  - soundID: fail_buzz
+    audioFile: {fileID: 8300000, guid: 7dc1ca7e4295c5e45ac75a3292bb90bb, type: 3}
+    soundType: 1
+    volume: 0.75
     useRandomPitch: 0
     pitchRandomRange: 0.1
     basePitch: 1
@@ -1513,7 +1666,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1343763747}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1532,7 +1685,7 @@ RectTransform:
   - {fileID: 152273216}
   - {fileID: 116574673}
   - {fileID: 976527359}
-  m_Father: {fileID: 1448653065}
+  m_Father: {fileID: 679410398}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1788,7 +1941,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 679410398}
-  - {fileID: 1343763748}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1807,6 +1959,7 @@ GameObject:
   - component: {fileID: 1454399417}
   - component: {fileID: 1454399419}
   - component: {fileID: 1454399418}
+  - component: {fileID: 1454399420}
   m_Layer: 5
   m_Name: Paint blue
   m_TagString: Untagged
@@ -1831,7 +1984,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 895, y: 172}
-  m_SizeDelta: {x: 400, y: 400}
+  m_SizeDelta: {x: 400, y: 218.7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1454399418
 MonoBehaviour:
@@ -1847,7 +2000,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1871,6 +2024,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1454399416}
   m_CullTransparentMesh: 1
+--- !u!114 &1454399420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1454399416}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 055e8667b541a2c40a4c017e5d64ef9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuPropHover
+  rotationAngle: 15
+  rotateDuration: 0.35
+  returnDuration: 0.45
+  enterEase: 6
+  returnEase: 6
 --- !u!1 &1518280967
 GameObject:
   m_ObjectHideFlags: 0
@@ -1882,6 +2052,7 @@ GameObject:
   - component: {fileID: 1518280968}
   - component: {fileID: 1518280970}
   - component: {fileID: 1518280969}
+  - component: {fileID: 1518280971}
   m_Layer: 5
   m_Name: Pencil (1)
   m_TagString: Untagged
@@ -1922,7 +2093,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1946,6 +2117,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1518280967}
   m_CullTransparentMesh: 1
+--- !u!114 &1518280971
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1518280967}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 055e8667b541a2c40a4c017e5d64ef9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuPropHover
+  rotationAngle: 15
+  rotateDuration: 0.35
+  returnDuration: 0.45
+  enterEase: 6
+  returnEase: 6
 --- !u!1 &1621170942
 GameObject:
   m_ObjectHideFlags: 0
@@ -1957,6 +2145,7 @@ GameObject:
   - component: {fileID: 1621170943}
   - component: {fileID: 1621170945}
   - component: {fileID: 1621170944}
+  - component: {fileID: 1621170946}
   m_Layer: 5
   m_Name: Palette (1)
   m_TagString: Untagged
@@ -1997,7 +2186,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -2021,6 +2210,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1621170942}
   m_CullTransparentMesh: 1
+--- !u!114 &1621170946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1621170942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 055e8667b541a2c40a4c017e5d64ef9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuPropHover
+  rotationAngle: 15
+  rotateDuration: 0.35
+  returnDuration: 0.45
+  enterEase: 6
+  returnEase: 6
 --- !u!1 &1624602885
 GameObject:
   m_ObjectHideFlags: 0
@@ -2222,6 +2428,7 @@ GameObject:
   - component: {fileID: 1707596505}
   - component: {fileID: 1707596507}
   - component: {fileID: 1707596506}
+  - component: {fileID: 1707596508}
   m_Layer: 5
   m_Name: Brush
   m_TagString: Untagged
@@ -2246,7 +2453,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 849, y: -363}
-  m_SizeDelta: {x: 700, y: 700}
+  m_SizeDelta: {x: 227.98, y: 700}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1707596506
 MonoBehaviour:
@@ -2262,7 +2469,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -2286,6 +2493,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1707596504}
   m_CullTransparentMesh: 1
+--- !u!114 &1707596508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1707596504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 055e8667b541a2c40a4c017e5d64ef9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuPropHover
+  rotationAngle: 15
+  rotateDuration: 0.35
+  returnDuration: 0.45
+  enterEase: 6
+  returnEase: 6
 --- !u!1 &1750746135
 GameObject:
   m_ObjectHideFlags: 0
@@ -2297,6 +2521,7 @@ GameObject:
   - component: {fileID: 1750746136}
   - component: {fileID: 1750746138}
   - component: {fileID: 1750746137}
+  - component: {fileID: 1750746139}
   m_Layer: 5
   m_Name: Palette
   m_TagString: Untagged
@@ -2311,16 +2536,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1750746135}
-  m_LocalRotation: {x: 0, y: 0, z: -0.27899122, w: 0.96029365}
+  m_LocalRotation: {x: 0, y: 0, z: -0.15384822, w: 0.9880945}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1343763748}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -32.4}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -17.7}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -274, y: -535}
+  m_AnchoredPosition: {x: -220, y: -553}
   m_SizeDelta: {x: 500, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1750746137
@@ -2337,7 +2562,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -2361,6 +2586,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1750746135}
   m_CullTransparentMesh: 1
+--- !u!114 &1750746139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1750746135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 055e8667b541a2c40a4c017e5d64ef9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuPropHover
+  rotationAngle: 15
+  rotateDuration: 0.35
+  returnDuration: 0.45
+  enterEase: 6
+  returnEase: 6
 --- !u!1 &1801118652
 GameObject:
   m_ObjectHideFlags: 0
@@ -2641,6 +2883,7 @@ GameObject:
   - component: {fileID: 2138093231}
   - component: {fileID: 2138093233}
   - component: {fileID: 2138093232}
+  - component: {fileID: 2138093234}
   m_Layer: 5
   m_Name: Pencil
   m_TagString: Untagged
@@ -2681,7 +2924,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -2705,6 +2948,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2138093230}
   m_CullTransparentMesh: 1
+--- !u!114 &2138093234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2138093230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 055e8667b541a2c40a4c017e5d64ef9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuPropHover
+  rotationAngle: 15
+  rotateDuration: 0.35
+  returnDuration: 0.45
+  enterEase: 6
+  returnEase: 6
 --- !u!1001 &188373627892322681
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2763,7 +3023,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5498016153618147686, guid: d008507271548b043b7a008f4fa0b4cc, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5498016153618147686, guid: d008507271548b043b7a008f4fa0b4cc, type: 3}
       propertyPath: m_LocalRotation.w

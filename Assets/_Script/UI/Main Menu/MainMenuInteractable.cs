@@ -72,11 +72,42 @@ public class MainMenuInteractable : MonoBehaviour
         // 3. Auto-attach UIButtonJuice hover & click animations to all buttons
         AutoAttachButtonJuice();
 
+        // 4. Reset prop hover triggers for props in Main Menu
+        MainMenuPropHover[] props = GetComponentsInChildren<MainMenuPropHover>(true);
+        foreach (var prop in props)
+        {
+            if (prop != null) prop.ResetTrigger();
+        }
+
         // 4. Play Festive Main Menu Entrance Animations
         if (useDOTweenAnimations)
         {
             AnimateMainMenuEntrance();
         }
+    }
+
+    private void Update()
+    {
+        if (IsEscapeKeyPressed())
+        {
+            if (SettingsPanel != null && SettingsPanel.activeSelf)
+            {
+                CloseSettingPanel();
+            }
+        }
+    }
+
+    private bool IsEscapeKeyPressed()
+    {
+#if ENABLE_LEGACY_INPUT_MANAGER
+        if (Input.GetKeyDown(KeyCode.Escape)) return true;
+#endif
+
+#if ENABLE_INPUT_SYSTEM
+        if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.escapeKey.wasPressedThisFrame) return true;
+#endif
+
+        return false;
     }
 
     private void AutoAttachButtonJuice()

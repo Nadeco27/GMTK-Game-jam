@@ -80,6 +80,17 @@ public class PauseUI : MonoBehaviour
 
     private CanvasGroup panelCanvasGroup;
     private Tween activeEntranceTween;
+    private bool isTransitioning = false;
+    private float targetOverlayAlpha = -1f;
+
+    private void CacheDarkBackgroundAlpha()
+    {
+        if (darkBackgroundOverlay != null && targetOverlayAlpha < 0f)
+        {
+            float a = darkBackgroundOverlay.color.a;
+            targetOverlayAlpha = a > 0.05f ? a : 0.75f;
+        }
+    }
     private void Awake()
     {
         if (_instance != null && _instance != this)
@@ -92,6 +103,7 @@ public class PauseUI : MonoBehaviour
         }
 
         _instance = this;
+        isTransitioning = false;
         if (transform.parent == null)
         {
             DontDestroyOnLoad(gameObject);
@@ -132,6 +144,7 @@ public class PauseUI : MonoBehaviour
     public void CopyReferencesFrom(PauseUI source)
     {
         if (source == null) return;
+        isTransitioning = false;
 
         this.pausePanel = source.pausePanel;
         this.darkBackgroundOverlay = source.darkBackgroundOverlay;
@@ -174,6 +187,7 @@ public class PauseUI : MonoBehaviour
 
     private void OnDestroy()
     {
+        isTransitioning = false;
         activeEntranceTween?.Kill();
         if (pausePanel != null) pausePanel.transform.DOKill();
     }
@@ -255,7 +269,10 @@ public class PauseUI : MonoBehaviour
         string currentScene = SceneManager.GetActiveScene().name;
         if (IsNonPauseScene(currentScene)) return;
 
-        // 2. Listen for Escape Key
+        // 2. Ignore Escape inputs while transitioning panels (anti-spam protection)
+        if (isTransitioning) return;
+
+        // 3. Listen for Escape Key
         if (IsEscapeKeyPressed())
         {
             // Do not trigger pause if InfoPanelUI is open (let InfoPanel close first)
@@ -264,16 +281,23 @@ public class PauseUI : MonoBehaviour
                 return;
             }
 
-            // If Settings Panel is open while paused, close Settings and re-open Pause UI
-            if (IsPaused && settingsPanel != null && settingsPanel.activeSelf)
-            {
-                CloseSettingsAndReturnToPause();
-                return;
-            }
-
-            // Toggle Pause
             if (IsPaused)
             {
+                // Priority 1: Close Main Menu Confirmation panel first if active
+                if (IsConfirmationOpen())
+                {
+                    CancelReturnToMainMenu();
+                    return;
+                }
+
+                // Priority 2: Close Settings panel first if active
+                if (IsSettingsOpen())
+                {
+                    CloseSettingsAndReturnToPause();
+                    return;
+                }
+
+                // Priority 3: Close Pause UI and resume game
                 ResumeGame();
             }
             else
@@ -281,6 +305,27 @@ public class PauseUI : MonoBehaviour
                 PauseGame();
             }
         }
+    }
+
+    private bool IsSettingsOpen()
+    {
+        if (settingsPanel != null && settingsPanel.activeInHierarchy)
+        {
+            return true;
+        }
+
+        SettingsUI settingsUI = FindFirstObjectByType<SettingsUI>(FindObjectsInactive.Include);
+        if (settingsUI != null && settingsUI.IsSettingsOpen)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool IsConfirmationOpen()
+    {
+        return confirmMainMenuPanel != null && confirmMainMenuPanel.activeInHierarchy;
     }
 
     private bool IsNonPauseScene(string sceneName)
@@ -307,14 +352,16 @@ public class PauseUI : MonoBehaviour
 
     /// <summary>
     /// Pauses the game, locks player movement & interactions, and displays the Pause Panel with DOTween animations.
+    /// Dark background overlay uses pure fade-in animation, while title and buttons use pop entrance.
     /// </summary>
     public void PauseGame()
     {
-        if (IsPaused) return;
+        if (IsPaused || isTransitioning) return;
 
         RebindReferencesIfMissing();
 
         IsPaused = true;
+        isTransitioning = true;
         Time.timeScale = 0f;
 
         // Lock player controller movement and velocity
@@ -338,87 +385,182 @@ public class PauseUI : MonoBehaviour
         {
             pausePanel.transform.DOKill();
             pausePanel.SetActive(true);
+            pausePanel.transform.localScale = Vector3.one;
+
+            if (panelCanvasGroup != null) panelCanvasGroup.alpha = 1f;
+
+            // 1. Dark background overlay: pure fade-in (no pop / scale effect)
+            if (darkBackgroundOverlay != null)
+            {
+                CacheDarkBackgroundAlpha();
+                darkBackgroundOverlay.DOKill();
+                darkBackgroundOverlay.transform.localScale = Vector3.one;
+
+                Color c = darkBackgroundOverlay.color;
+                c.a = 0f;
+                darkBackgroundOverlay.color = c;
+                darkBackgroundOverlay.DOFade(targetOverlayAlpha, popAnimDuration).SetUpdate(true);
+            }
 
             if (useDOTweenAnimations)
             {
                 activeEntranceTween?.Kill();
 
-                pausePanel.transform.localScale = Vector3.zero;
-                if (panelCanvasGroup != null) panelCanvasGroup.alpha = 0f;
-
-                // Elastic Pop-In Entrance (SetUpdate(true) ignores timeScale = 0)
-                pausePanel.transform.DOScale(Vector3.one, popAnimDuration).SetEase(Ease.OutBack).SetUpdate(true);
-                if (panelCanvasGroup != null) panelCanvasGroup.DOFade(1f, popAnimDuration * 0.6f).SetUpdate(true);
-
-                // Title Text Pulse
+                // 2. Staggered Pop-In for Title and Buttons
                 if (pauseTitleTransform != null)
                 {
+                    pauseTitleTransform.DOKill();
                     pauseTitleTransform.localScale = Vector3.zero;
                     pauseTitleTransform.DOScale(Vector3.one, 0.35f).SetEase(Ease.OutBack).SetDelay(0.1f).SetUpdate(true);
                 }
 
-                // Staggered Pop-In for Buttons
                 if (resumeButton != null)
                 {
+                    resumeButton.transform.DOKill();
                     resumeButton.transform.localScale = Vector3.zero;
                     resumeButton.transform.DOScale(Vector3.one, 0.35f).SetEase(Ease.OutBack).SetDelay(0.15f).SetUpdate(true);
                 }
 
                 if (settingsButton != null)
                 {
+                    settingsButton.transform.DOKill();
                     settingsButton.transform.localScale = Vector3.zero;
                     settingsButton.transform.DOScale(Vector3.one, 0.35f).SetEase(Ease.OutBack).SetDelay(0.25f).SetUpdate(true);
                 }
 
                 if (mainMenuButton != null)
                 {
+                    mainMenuButton.transform.DOKill();
                     mainMenuButton.transform.localScale = Vector3.zero;
-                    mainMenuButton.transform.DOScale(Vector3.one, 0.35f).SetEase(Ease.OutBack).SetDelay(0.35f).SetUpdate(true);
+                    activeEntranceTween = mainMenuButton.transform.DOScale(Vector3.one, 0.35f)
+                        .SetEase(Ease.OutBack)
+                        .SetDelay(0.35f)
+                        .SetUpdate(true)
+                        .OnComplete(() =>
+                        {
+                            isTransitioning = false;
+                        });
+                }
+                else
+                {
+                    DOVirtual.DelayedCall(popAnimDuration, () => isTransitioning = false).SetUpdate(true);
                 }
             }
             else
             {
-                pausePanel.transform.localScale = Vector3.one;
-                if (panelCanvasGroup != null) panelCanvasGroup.alpha = 1f;
+                if (pauseTitleTransform != null) pauseTitleTransform.localScale = Vector3.one;
+                if (resumeButton != null) resumeButton.transform.localScale = Vector3.one;
+                if (settingsButton != null) settingsButton.transform.localScale = Vector3.one;
+                if (mainMenuButton != null) mainMenuButton.transform.localScale = Vector3.one;
+                if (darkBackgroundOverlay != null)
+                {
+                    Color c = darkBackgroundOverlay.color;
+                    c.a = targetOverlayAlpha;
+                    darkBackgroundOverlay.color = c;
+                }
+                isTransitioning = false;
             }
+        }
+        else
+        {
+            isTransitioning = false;
         }
     }
 
     /// <summary>
     /// Resumes the game, unfreezes time, and re-enables player controls.
+    /// Dark background overlay uses pure fade-out animation.
     /// </summary>
     public void ResumeGame()
     {
-        if (!IsPaused) return;
+        if (!IsPaused || isTransitioning) return;
+
+        isTransitioning = true;
 
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlaySFX("button_click");
         }
 
+        if (confirmMainMenuPanel != null)
+        {
+            confirmMainMenuPanel.transform.DOKill();
+            confirmMainMenuPanel.SetActive(false);
+        }
+
+        if (settingsPanel != null)
+        {
+            settingsPanel.transform.DOKill();
+            settingsPanel.SetActive(false);
+        }
+
         if (pausePanel != null && useDOTweenAnimations)
         {
             activeEntranceTween?.Kill();
-            pausePanel.transform.DOKill();
-            pausePanel.transform.DOScale(Vector3.zero, 0.22f)
-                .SetEase(Ease.InBack)
-                .SetUpdate(true)
-                .OnComplete(() =>
-                {
-                    pausePanel.SetActive(false);
-                    pausePanel.transform.localScale = Vector3.one;
-                    UnfreezeAndUnlockPlayer();
-                });
+
+            // 1. Dark background overlay: pure fade-out
+            if (darkBackgroundOverlay != null)
+            {
+                darkBackgroundOverlay.DOKill();
+                darkBackgroundOverlay.DOFade(0f, 0.22f).SetUpdate(true);
+            }
+
+            // 2. Scale down UI elements
+            if (pauseTitleTransform != null)
+            {
+                pauseTitleTransform.DOKill();
+                pauseTitleTransform.DOScale(Vector3.zero, 0.22f).SetEase(Ease.InBack).SetUpdate(true);
+            }
+
+            if (resumeButton != null)
+            {
+                resumeButton.transform.DOKill();
+                resumeButton.transform.DOScale(Vector3.zero, 0.22f).SetEase(Ease.InBack).SetUpdate(true);
+            }
+
+            if (settingsButton != null)
+            {
+                settingsButton.transform.DOKill();
+                settingsButton.transform.DOScale(Vector3.zero, 0.22f).SetEase(Ease.InBack).SetUpdate(true);
+            }
+
+            Tween exitTween = null;
+            if (mainMenuButton != null)
+            {
+                mainMenuButton.transform.DOKill();
+                exitTween = mainMenuButton.transform.DOScale(Vector3.zero, 0.22f).SetEase(Ease.InBack).SetUpdate(true);
+            }
+
+            if (exitTween != null)
+            {
+                exitTween.OnComplete(() => FinishResumeGame());
+            }
+            else
+            {
+                DOVirtual.DelayedCall(0.22f, () => FinishResumeGame()).SetUpdate(true);
+            }
         }
         else
         {
-            if (pausePanel != null)
-            {
-                pausePanel.SetActive(false);
-                pausePanel.transform.localScale = Vector3.one;
-            }
-            UnfreezeAndUnlockPlayer();
+            FinishResumeGame();
         }
+    }
+
+    private void FinishResumeGame()
+    {
+        if (pausePanel != null)
+        {
+            pausePanel.SetActive(false);
+            pausePanel.transform.localScale = Vector3.one;
+        }
+
+        if (pauseTitleTransform != null) pauseTitleTransform.localScale = Vector3.one;
+        if (resumeButton != null) resumeButton.transform.localScale = Vector3.one;
+        if (settingsButton != null) settingsButton.transform.localScale = Vector3.one;
+        if (mainMenuButton != null) mainMenuButton.transform.localScale = Vector3.one;
+
+        UnfreezeAndUnlockPlayer();
+        isTransitioning = false;
     }
 
     private void UnfreezeAndUnlockPlayer()
@@ -438,12 +580,12 @@ public class PauseUI : MonoBehaviour
     }
 
     /// <summary>
-    /// Closes Pause Panel and opens Settings Panel.
-    /// <summary>
     /// Opens Settings Panel without disabling Pause Panel.
     /// </summary>
     public void OpenSettingsFromPause()
     {
+        if (isTransitioning) return;
+
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlaySFX("button_click");
@@ -467,10 +609,20 @@ public class PauseUI : MonoBehaviour
 
         if (settingsPanel != null)
         {
+            SettingsUI settingsUI = settingsPanel.GetComponent<SettingsUI>();
+            if (settingsUI != null)
+            {
+                settingsUI.EnsurePanelActive();
+            }
+
+            isTransitioning = true;
             settingsPanel.transform.DOKill();
             settingsPanel.SetActive(true);
             settingsPanel.transform.localScale = Vector3.zero;
-            settingsPanel.transform.DOScale(Vector3.one, 0.35f).SetEase(Ease.OutBack).SetUpdate(true);
+            settingsPanel.transform.DOScale(Vector3.one, 0.35f)
+                .SetEase(Ease.OutBack)
+                .SetUpdate(true)
+                .OnComplete(() => isTransitioning = false);
         }
         else
         {
@@ -480,20 +632,39 @@ public class PauseUI : MonoBehaviour
 
     public void CloseSettingsAndReturnToPause()
     {
+        if (isTransitioning) return;
+
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlaySFX("button_click");
         }
 
+        if (settingsPanel == null)
+        {
+            SettingsUI settingsUI = FindFirstObjectByType<SettingsUI>(FindObjectsInactive.Include);
+            if (settingsUI != null)
+            {
+                settingsPanel = settingsUI.gameObject;
+            }
+        }
+
         if (settingsPanel != null)
         {
+            isTransitioning = true;
             settingsPanel.transform.DOKill();
-            settingsPanel.transform.DOScale(Vector3.zero, 0.2f).SetEase(Ease.InBack).SetUpdate(true)
+            settingsPanel.transform.DOScale(Vector3.zero, 0.2f)
+                .SetEase(Ease.InBack)
+                .SetUpdate(true)
                 .OnComplete(() =>
                 {
                     settingsPanel.SetActive(false);
                     settingsPanel.transform.localScale = Vector3.one;
+                    isTransitioning = false;
                 });
+        }
+        else
+        {
+            isTransitioning = false;
         }
     }
 
@@ -502,6 +673,8 @@ public class PauseUI : MonoBehaviour
     /// </summary>
     public void OpenMainMenuConfirmation()
     {
+        if (isTransitioning) return;
+
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlaySFX("button_click");
@@ -509,10 +682,14 @@ public class PauseUI : MonoBehaviour
 
         if (confirmMainMenuPanel != null)
         {
+            isTransitioning = true;
             confirmMainMenuPanel.transform.DOKill();
             confirmMainMenuPanel.SetActive(true);
             confirmMainMenuPanel.transform.localScale = Vector3.zero;
-            confirmMainMenuPanel.transform.DOScale(Vector3.one, 0.35f).SetEase(Ease.OutBack).SetUpdate(true);
+            confirmMainMenuPanel.transform.DOScale(Vector3.one, 0.35f)
+                .SetEase(Ease.OutBack)
+                .SetUpdate(true)
+                .OnComplete(() => isTransitioning = false);
         }
         else
         {
@@ -526,6 +703,8 @@ public class PauseUI : MonoBehaviour
     /// </summary>
     public void ConfirmReturnToMainMenu()
     {
+        if (isTransitioning) return;
+
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlaySFX("button_click");
@@ -539,6 +718,8 @@ public class PauseUI : MonoBehaviour
     /// </summary>
     public void CancelReturnToMainMenu()
     {
+        if (isTransitioning) return;
+
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlaySFX("button_click");
@@ -546,13 +727,21 @@ public class PauseUI : MonoBehaviour
 
         if (confirmMainMenuPanel != null)
         {
+            isTransitioning = true;
             confirmMainMenuPanel.transform.DOKill();
-            confirmMainMenuPanel.transform.DOScale(Vector3.zero, 0.2f).SetEase(Ease.InBack).SetUpdate(true)
+            confirmMainMenuPanel.transform.DOScale(Vector3.zero, 0.2f)
+                .SetEase(Ease.InBack)
+                .SetUpdate(true)
                 .OnComplete(() =>
                 {
                     confirmMainMenuPanel.SetActive(false);
                     confirmMainMenuPanel.transform.localScale = Vector3.one;
+                    isTransitioning = false;
                 });
+        }
+        else
+        {
+            isTransitioning = false;
         }
     }
 
@@ -561,11 +750,17 @@ public class PauseUI : MonoBehaviour
     /// </summary>
     public void ReturnToMainMenuFromPause()
     {
+        isTransitioning = false;
         UnfreezeAndUnlockPlayer();
 
         if (confirmMainMenuPanel != null)
         {
             confirmMainMenuPanel.SetActive(false);
+        }
+
+        if (settingsPanel != null)
+        {
+            settingsPanel.SetActive(false);
         }
 
         if (pausePanel != null)

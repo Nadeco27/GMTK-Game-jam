@@ -106,6 +106,10 @@ public class CrossSceneDoor : MonoBehaviour
             if (Time.time >= nextNotificationTime)
             {
                 nextNotificationTime = Time.time + 2.0f;
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySFX("fail_buzz");
+                }
                 if (!string.IsNullOrEmpty(lockedNotificationMessage))
                 {
                     NotificationUI.ShowNotification(lockedNotificationMessage);

@@ -66,6 +66,17 @@ public class PlayerController : MonoBehaviour
         {
             gameObject.AddComponent<Inventory>();
         }
+
+        // Disable any TrailRenderer with missing material to prevent magenta collision streaks
+        TrailRenderer[] trailRenderers = GetComponentsInChildren<TrailRenderer>(true);
+        foreach (TrailRenderer tr in trailRenderers)
+        {
+            tr.Clear();
+            if (tr.sharedMaterial == null || tr.materials == null || tr.materials.Length == 0 || tr.materials[0] == null)
+            {
+                tr.enabled = false;
+            }
+        }
     }
 
     //  private void OnEnable()
@@ -167,6 +178,10 @@ public class PlayerController : MonoBehaviour
         foreach (TrailRenderer tr in trailRenderers)
         {
             tr.Clear();
+            if (tr.sharedMaterial == null || tr.materials == null || tr.materials.Length == 0 || tr.materials[0] == null)
+            {
+                tr.enabled = false;
+            }
         }
     }
 }
