@@ -25,12 +25,24 @@ public class CrossSceneDoor : MonoBehaviour
     public Animator doorAnimator; // Optional (jika pintu tidak pakai animasi, bisa dikosongkan)
     [Tooltip("Jika di-centang, GameObject pintu akan di-disable saat terbuka")]
     public bool disableGameObjectOnOpen = false;
+
+    [Header("Notification Settings")]
+    [Tooltip("Pesan notifikasi yang tampil saat player bertabrakan dengan pintu yang belum terbuka.")]
+    [SerializeField] private string lockedNotificationMessage = "It won't budge.";
     
     private bool isOpen = false;
+    private float nextNotificationTime = 0f;
 
     private string GetDoorID()
     {
         return $"{gameObject.scene.name}_{gameObject.name}_{transform.position.x:F2}_{transform.position.y:F2}";
+    }
+
+    private void Awake()
+    {
+        if (doorCollider == null) doorCollider = GetComponent<Collider2D>();
+        if (doorRenderer == null) doorRenderer = GetComponent<SpriteRenderer>();
+        if (doorAnimator == null) doorAnimator = GetComponent<Animator>();
     }
 
     private void Start()
@@ -63,6 +75,33 @@ public class CrossSceneDoor : MonoBehaviour
         if (allButtonsPressed && !isOpen)
         {
             OpenDoor();
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        HandlePlayerCollision(collision.gameObject);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        HandlePlayerCollision(collider.gameObject);
+    }
+
+    private void HandlePlayerCollision(GameObject targetObj)
+    {
+        if (isOpen) return;
+
+        if (targetObj.CompareTag("Player") || targetObj.GetComponent<PlayerController>() != null)
+        {
+            if (Time.time >= nextNotificationTime)
+            {
+                nextNotificationTime = Time.time + 2.0f;
+                if (!string.IsNullOrEmpty(lockedNotificationMessage))
+                {
+                    NotificationUI.ShowNotification(lockedNotificationMessage);
+                }
+            }
         }
     }
 
