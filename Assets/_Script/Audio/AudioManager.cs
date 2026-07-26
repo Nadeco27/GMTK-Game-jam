@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 /// <summary>
 /// Central Singleton Audio Manager for managing all game audio clips, SFX, background music,
@@ -65,6 +68,13 @@ public class AudioManager : MonoBehaviour
     [Tooltip("If true, automatically plays the next random music track when the current non-looping track finishes.")]
     [SerializeField] private bool autoPlayNextMusicWhenEnded = true;
 
+    [Header("Debug Controls")]
+    [Tooltip("If true, enables debug keyboard shortcuts (e.g. F8 to fast forward current music to 2s before end).")]
+    [SerializeField] private bool enableDebugHotkeys = true;
+
+    [Tooltip("Shortcut key to fast-forward current playing music to 2 seconds before the end.")]
+    [SerializeField] private KeyCode fastForwardMusicKey = KeyCode.F8;
+
     // Fast lookup dictionary
     private Dictionary<string, Sound> soundDict = new Dictionary<string, Sound>();
 
@@ -77,6 +87,7 @@ public class AudioManager : MonoBehaviour
     private string currentMusicID = string.Empty;
     private string lastRandomMusicID = string.Empty;
     private Coroutine activeCrossfadeRoutine;
+    private bool trackHasBeenPlaying = false;
 
     // Pool of AudioSources for SFX
     private List<AudioSource> sfxSourcePool = new List<AudioSource>();
@@ -156,16 +167,35 @@ public class AudioManager : MonoBehaviour
 
     private void Update()
     {
+        if (enableDebugHotkeys)
+        {
+#if ENABLE_INPUT_SYSTEM
+            if (Keyboard.current != null && Keyboard.current.f8Key.wasPressedThisFrame)
+            {
+                FastForwardMusicToEnd();
+            }
+#elif ENABLE_LEGACY_INPUT_MANAGER
+            if (Input.GetKeyDown(fastForwardMusicKey))
+            {
+                FastForwardMusicToEnd();
+            }
+#endif
+        }
+
         // Monitor active music playback and auto-advance to next random track ONLY if non-looping track naturally ends
         if (autoPlayNextMusicWhenEnded && !string.IsNullOrEmpty(currentMusicID) && activeCrossfadeRoutine == null && isApplicationFocused)
         {
             AudioSource activeSource = isSourceAPlaying ? musicSourceA : musicSourceB;
             if (activeSource != null && activeSource.clip != null && !activeSource.loop)
             {
-                // Only consider track finished if playback position has reached the end of the clip
-                bool isTrackFinished = !activeSource.isPlaying && activeSource.time >= (activeSource.clip.length - 0.3f);
-                if (isTrackFinished)
+                if (activeSource.isPlaying)
                 {
+                    trackHasBeenPlaying = true;
+                }
+                else if (trackHasBeenPlaying)
+                {
+                    // Track was playing previously, but has naturally stopped reaching the end of the clip
+                    trackHasBeenPlaying = false;
                     Debug.Log("[AudioManager] Current music finished naturally. Auto-playing next random track.");
                     PlayRandomMusic(defaultCrossfadeDuration);
                 }
@@ -338,6 +368,7 @@ public class AudioManager : MonoBehaviour
         }
 
         currentMusicID = soundID;
+        trackHasBeenPlaying = false;
 
         AudioSource newSource = isSourceAPlaying ? musicSourceB : musicSourceA;
         AudioSource oldSource = isSourceAPlaying ? musicSourceA : musicSourceB;
@@ -410,6 +441,7 @@ public class AudioManager : MonoBehaviour
                 oldSource.Stop();
                 oldSource.volume = 0f;
             }
+            activeCrossfadeRoutine = null;
             yield break;
         }
 
@@ -534,6 +566,41 @@ public class AudioManager : MonoBehaviour
 
         // Fallback linear search if dict missed
         return sounds.Find(s => s != null && s.soundID == soundID);
+    }
+
+    #endregion
+
+    #region Debug Tools
+
+    /// <summary>
+    /// Fast-forwards currently playing music track to 2 seconds before it ends.
+    /// Accessible via Inspector Context Menu (Right Click component -> 'Debug: Fast Forward Music (2s Left)') or F8 key during Play Mode.
+    /// </summary>
+    [ContextMenu("Debug: Fast Forward Music (2s Left)")]
+    public void FastForwardMusicToEnd()
+    {
+        AudioSource activeSource = isSourceAPlaying ? musicSourceA : musicSourceB;
+        if (activeSource != null && activeSource.clip != null && activeSource.isPlaying)
+        {
+            float targetTime = Mathf.Max(0f, activeSource.clip.length - 2f);
+            activeSource.time = targetTime;
+            Debug.Log($"[AudioManager Debug] Fast-forwarded track '{currentMusicID}' to {targetTime:F1}s / {activeSource.clip.length:F1}s (2s remaining).");
+        }
+        else
+        {
+            Debug.LogWarning("[AudioManager Debug] Cannot fast-forward: No active music track is currently playing.");
+        }
+    }
+
+    /// <summary>
+    /// Forces playback of the next random music track immediately.
+    /// Accessible via Inspector Context Menu (Right Click component -> 'Debug: Skip to Next Music').
+    /// </summary>
+    [ContextMenu("Debug: Skip to Next Music")]
+    public void DebugSkipToNextMusic()
+    {
+        Debug.Log("[AudioManager Debug] Manually skipping to next random music track.");
+        PlayRandomMusic(defaultCrossfadeDuration);
     }
 
     #endregion
